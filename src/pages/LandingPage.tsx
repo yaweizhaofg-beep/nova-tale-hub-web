@@ -76,7 +76,7 @@ export function LandingPage({ navigate }: Nav) {
     </header>
 
     <section className="xl-hero" aria-label="星核耀火Hub创作平台">
-      <video ref={video} className="xl-hero-video" src={`${media}landing-hero.mp4`} poster={`${media}landing-hero-poster.jpg`} autoPlay muted loop playsInline preload="metadata" aria-hidden="true" />
+      <video ref={video} className="xl-hero-video" src={`${media}landing-hero-web.mp4`} poster={`${media}landing-hero-poster.jpg`} autoPlay muted loop playsInline preload="auto" aria-hidden="true" />
       <div className="xl-hero-shade" />
       <AnnouncementCarousel onPlaybackChange={setBackgroundPaused} onOffer={()=>setOffer(true)} onCreate={()=>navigate("new-project")} />
       <div className="xl-hero-copy">

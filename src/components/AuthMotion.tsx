@@ -16,7 +16,7 @@ export function AuthMotion() {
   const toggle=async()=>{if(!video.current)return;if(video.current.paused){try{await video.current.play()}catch{setPaused(true)}}else video.current.pause()};
   return <>
     <div className="auth-motion" aria-hidden="true">
-      <video ref={video} className="auth-motion-video" src={`${media}landing-hero.mp4`} poster={`${media}landing-hero-poster.jpg`} autoPlay muted loop playsInline preload="metadata" onPlay={()=>{if(matchMedia("(prefers-reduced-motion: reduce)").matches){video.current?.pause();return}setPaused(false)}} onPause={()=>setPaused(true)} onError={()=>setFailed(true)}/>
+      <video ref={video} className="auth-motion-video" src={`${media}landing-hero-web.mp4`} poster={`${media}landing-hero-poster.jpg`} autoPlay muted loop playsInline preload="metadata" onPlay={()=>{if(matchMedia("(prefers-reduced-motion: reduce)").matches){video.current?.pause();return}setPaused(false)}} onPause={()=>setPaused(true)} onError={()=>setFailed(true)}/>
       <div className="auth-motion-shade" />
     </div>
     <button type="button" className="auth-motion-control" onClick={toggle} disabled={failed} aria-label={paused ? "播放背景动画" : "暂停背景动画"} aria-pressed={paused}>
