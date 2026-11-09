@@ -20,7 +20,7 @@
 //   sort     排序：time（开始时间倒序）| actual（实扣倒序）
 // ═══════════════════════════════════════════════════════════════════════════════════
 
-import { getRecentStart, TODAY } from "../../records";
+import { getRecentStart, TODAY, TASK_CATEGORIES, TASK_STATUSES } from "../../records";
 import type { TaskCategory, TaskStatus } from "../../records";
 import type { TeamTabId } from "./shared";
 
@@ -79,8 +79,8 @@ export function defaultUsageRoute(): UsageRoute {
 }
 
 const VALID_VIEWS: UsageView[] = ["overview", "members", "tasks"];
-const VALID_CATS: (TaskCategory | "all")[] = ["all", "语言模型", "图片生成", "视频生成"];
-const VALID_STATUS: (TaskStatus | "all")[] = ["all", "成功", "失败", "进行中", "排队中"];
+const VALID_CATS: (TaskCategory | "all")[] = ["all", ...TASK_CATEGORIES];
+const VALID_STATUS: (TaskStatus | "all")[] = ["all", ...TASK_STATUSES];
 
 /** 从查询串解析用量路由 */
 export function parseUsageRoute(search: string): UsageRoute {

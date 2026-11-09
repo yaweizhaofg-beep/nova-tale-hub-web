@@ -1,13 +1,15 @@
-import { useEffect, useRef, useState } from "react";
+import { ModalShell } from "@/components/ui";
+import { useWalletSnapshot } from "@/features/billing/wallet-query";
+import { useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import { Check, Gift, Sparkles } from "lucide-react";
 import { colors } from "../shared";
 import {
   PLANS, PLAN_PERIOD_DAYS, STARS_PER_YUAN, RECHARGE_VALID_DAYS, RECHARGE_PACKS,
-  getWallet, subscribeWallet, creditRecharge, findPlan, canUpgrade, computeUpgrade,
+  creditRecharge, findPlan, canUpgrade, computeUpgrade,
 } from "../billing";
 import type { Plan, SpaceKind } from "../billing";
-import { PrimaryBtn, GhostBtn, ModalShell, ModalHead, ModalFoot } from "./team/shared";
+import { PrimaryBtn, GhostBtn, ModalHead, ModalFoot } from "./team/shared";
 import "./membership.css";
 
 type Order = {
@@ -25,10 +27,8 @@ export default function MembershipPage({ currentSpace }: { currentSpace: SpaceKi
   const [rulesOpen, setRulesOpen] = useState(false);
   const [trialOpen, setTrialOpen] = useState(false);
   const [notice, setNotice] = useState("");
-  const [, redraw] = useState(0);
   const paymentLock = useRef(false);
-  useEffect(() => subscribeWallet(() => redraw(value => value + 1)), []);
-  const wallet = getWallet(scope);
+  const wallet = useWalletSnapshot().wallets[scope];
   const currentPlan = findPlan(wallet.planId);
   const active = wallet.planActive && new Date(wallet.planExpiresAt + "T23:59:59+08:00").getTime() > Date.now();
   const price = Number(amount);
@@ -156,7 +156,7 @@ export default function MembershipPage({ currentSpace }: { currentSpace: SpaceKi
       </details>
       {notice && <p className="membership-notice" role="status">{notice}</p>}
 
-      {order && <ModalShell onClose={() => setOrder(null)} width={460}>
+      {order && <ModalShell label="确认订单" onClose={() => setOrder(null)} width={460}>
         <ModalHead title={order.title} sub="演示支付，不产生真实扣款" onClose={() => setOrder(null)} />
         <div className="membership-confirm">
           <dl><div><dt>目标钱包</dt><dd>{scopeName(order.scope)}</dd></div>
@@ -170,7 +170,7 @@ export default function MembershipPage({ currentSpace }: { currentSpace: SpaceKi
         </div>
         <ModalFoot><GhostBtn onClick={() => setOrder(null)}>取消</GhostBtn><PrimaryBtn disabled={!agreed} onClick={confirm}>模拟支付 ¥{order.amount.toFixed(2)}</PrimaryBtn></ModalFoot>
       </ModalShell>}
-      {rulesOpen && <ModalShell onClose={() => setRulesOpen(false)} width={520}>
+      {rulesOpen && <ModalShell label="作品保存与合理使用规则" onClose={() => setRulesOpen(false)} width={520}>
         <ModalHead title="作品保存与合理使用规则" onClose={() => setRulesOpen(false)} />
         <div className="membership-confirm">
           <p>付费套餐默认永久保存作品，适用合理使用规则。</p>
@@ -178,7 +178,7 @@ export default function MembershipPage({ currentSpace }: { currentSpace: SpaceKi
           <p>具体阈值与完整服务协议待正式发布，购买前请查看当时生效的规则。</p>
         </div><ModalFoot><GhostBtn onClick={() => setRulesOpen(false)}>我知道了</GhostBtn></ModalFoot>
       </ModalShell>}
-      {trialOpen && <ModalShell onClose={() => setTrialOpen(false)} width={420}>
+      {trialOpen && <ModalShell label="免费试用" onClose={() => setTrialOpen(false)} width={420}>
         <ModalHead title="免费体验" onClose={() => setTrialOpen(false)} />
         <div className="membership-confirm"><Sparkles color={colors.accent} /><h2>50 体验积分</h2><p>每账号限领一次，1 人使用，最多同时运行 2 个任务。</p><p>可用模型与积分有效期将在体验开放时展示。</p></div>
         <ModalFoot><GhostBtn onClick={() => setTrialOpen(false)}>关闭</GhostBtn><PrimaryBtn disabled>暂未开放领取</PrimaryBtn></ModalFoot>

@@ -67,7 +67,7 @@ button.task-row[aria-pressed=true] { background: var(--task-selected); box-shado
   .task-date-controls input { max-width: 108px; }
 }
 .task-records-title { margin: 0; font-size: 22px; white-space: nowrap; }
-.task-toolbar-actions > select,
+.task-toolbar-actions > :is(select,[data-ui-select]),
 .task-time-filter summary {
   padding: 7px 8px;
   max-width: 132px;
@@ -105,4 +105,11 @@ button.task-row[aria-pressed=true] { background: var(--task-selected); box-shado
   .task-time-filter[open] { min-width: 0; }
   .task-time-options { width: 100%; box-sizing: border-box; }
   .task-time-options input { width: calc((100% - 32px) / 2); max-width: 108px; box-sizing: border-box; }
+}
+
+.task-toolbar-actions > [data-ui-select] {
+  --select-font-size: 12px;
+  --select-padding-start: 8px;
+  --select-color: var(--task-ink);
+  min-height: 35px;
 }

@@ -1,3 +1,5 @@
+import { Dialog, Select } from "@/components/ui";
+import { useLocation } from "react-router";
 // ═══════════════════════════════════════════════════════════════════════════════════
 // BillingPage — 账单与消耗
 // 面包屑 + 标题
@@ -32,7 +34,8 @@ type BillingTab = typeof billingTabs[number];
 const emptyFilters = { from: "", to: "", member: "", project: "", model: "" };
 
 export default function BillingPage({ navigate, space = "team" }: NavType & { space?: SpaceKind }) {
-  const [tab, setTab] = useState<BillingTab>(() => new URLSearchParams(window.location.search).has("task") ? "积分消耗" : "套餐购买");
+  const { search } = useLocation();
+  const [tab, setTab] = useState<BillingTab>(() => new URLSearchParams(search).has("task") ? "积分消耗" : "套餐购买");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filters, setFilters] = useState(emptyFilters);
   const filterCount = Number(!!(filters.from || filters.to)) + Number(!!filters.member) + Number(!!filters.project) + Number(!!filters.model);
@@ -74,13 +77,13 @@ export default function BillingPage({ navigate, space = "team" }: NavType & { sp
 
   // 从团队任务详情带过来的任务 ID：定位到对应账单记录
   useEffect(() => {
-    const t = new URLSearchParams(window.location.search).get("task");
+    const t = new URLSearchParams(search).get("task");
     setFocusTask(t);
     if (!t) return;
     // 该任务没有关联流水时给出提示
     const exists = records.some(r => r.taskId === t);
     if (!exists) setFocusTask(null);
-  }, [records]);
+  }, [records, search]);
 
   // 定位到目标行
   useEffect(() => {
@@ -125,7 +128,7 @@ export default function BillingPage({ navigate, space = "team" }: NavType & { sp
     const task = getTaskById(r.taskId);
     if (!task || task.space !== space) return;
     const page = space === "personal" ? "my-tasks" : "team-tasks";
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(search);
     const date = task.startedAt.slice(0, 10);
     const restore = focusTask === r.taskId && params.get("source") === page;
     navigate(page, {
@@ -234,10 +237,13 @@ export default function BillingPage({ navigate, space = "team" }: NavType & { sp
           gap: 12, padding: 14, borderBottom: `1px solid ${bdr}`, background: surface }}>
           <label style={{ minWidth: 140, maxWidth: "100%" }}>
             <span style={labelS}>模型</span>
-            <select aria-label="模型" style={iStyle} value={filters.model} onChange={event => updateFilters({ model: event.target.value })}>
-              <option value="">全部模型</option>
-              {[...models].sort().map(model => <option key={model} value={model}>{model}</option>)}
-            </select>
+            <Select
+              label="模型"
+              style={iStyle}
+              value={filters.model}
+              onValueChange={value => updateFilters({ model: value })}
+              options={[{ value: "", label: "全部模型" }, ...[...models].sort().map(model => ({ value: model, label: model }))]}
+            />
           </label>
           <label style={{ minWidth: 116 }}>
             <span style={labelS}>开始日期</span>
@@ -251,17 +257,23 @@ export default function BillingPage({ navigate, space = "team" }: NavType & { sp
           </label>
           <label style={{ minWidth: 140, maxWidth: "100%" }}>
             <span style={labelS}>对应项目</span>
-            <select aria-label="对应项目" style={iStyle} value={filters.project} onChange={e => updateFilters({ project: e.target.value })}>
-              <option value="">全部项目</option>
-              {[...projects].map(([id, name]) => <option key={id} value={id}>{name}</option>)}
-            </select>
+            <Select
+              label="对应项目"
+              style={iStyle}
+              value={filters.project}
+              onValueChange={value => updateFilters({ project: value })}
+              options={[{ value: "", label: "全部项目" }, ...[...projects].map(([id, name]) => ({ value: String(id), label: name }))]}
+            />
           </label>
           {space === "team" && <label style={{ minWidth: 116, maxWidth: "100%" }}>
             <span style={labelS}>使用人</span>
-            <select aria-label="使用人" style={iStyle} value={filters.member} onChange={e => updateFilters({ member: e.target.value })}>
-              <option value="">全部使用人</option>
-              {[...members].map(([id, name]) => <option key={id} value={id}>{name}</option>)}
-            </select>
+            <Select
+              label="使用人"
+              style={iStyle}
+              value={filters.member}
+              onValueChange={value => updateFilters({ member: value })}
+              options={[{ value: "", label: "全部使用人" }, ...[...members].map(([id, name]) => ({ value: String(id), label: name }))]}
+            />
           </label>}
           <button type="button" onClick={() => updateFilters(emptyFilters)} disabled={filterCount === 0}
             style={{ padding: "8px 12px", borderRadius: 8, border: `1px solid ${bdr}`,
@@ -376,18 +388,17 @@ export default function BillingPage({ navigate, space = "team" }: NavType & { sp
 
       {/* Invoice modal */}
       {invoiceOpen && (
-        <div style={{ position: "fixed", inset: 0, zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center",
-          background: "rgba(0,0,0,.65)", backdropFilter: "blur(4px)" }}
-          onClick={() => setInvoiceOpen(false)}>
-          <div style={{ width: 480, background: "#111318", border: `1px solid ${bdr}`, borderRadius: 16,
-            boxShadow: "0 32px 96px rgba(0,0,0,.8)", overflow: "hidden" }}
-            onClick={e => e.stopPropagation()}>
+        <Dialog label="开具发票" onClose={() => setInvoiceOpen(false)}
+          overlayStyle={{ position: "fixed", inset: 0, zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center",
+            background: "rgba(0,0,0,.65)", backdropFilter: "blur(4px)" }}
+          contentStyle={{ width: 480, background: "#111318", border: `1px solid ${bdr}`, borderRadius: 16,
+            boxShadow: "0 32px 96px rgba(0,0,0,.8)", overflow: "hidden" }}>
             <div style={{ padding: "18px 22px", borderBottom: `1px solid ${bdr}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <div>
                 <div style={{ fontSize: 15, fontWeight: 700, color: "white" }}>开具发票</div>
                 <div style={{ fontSize: 12, color: textMuted, marginTop: 2 }}>已选 {selectedOrders.length} 笔订单 · 开票金额 <span style={{ color: gold, fontWeight: 700 }}>¥{invoiceAmount}</span></div>
               </div>
-              <button onClick={() => setInvoiceOpen(false)} style={{ background: "none", border: "none", cursor: "pointer", color: textMuted, padding: 4 }}>
+              <button aria-label="关闭发票弹窗" onClick={() => setInvoiceOpen(false)} style={{ background: "none", border: "none", cursor: "pointer", color: textMuted, padding: 4 }}>
                 <X style={{ width: 16, height: 16 }} />
               </button>
             </div>
@@ -450,8 +461,7 @@ export default function BillingPage({ navigate, space = "team" }: NavType & { sp
                 </div>
               </div>
             )}
-          </div>
-        </div>
+        </Dialog>
       )}
     </div>
   );

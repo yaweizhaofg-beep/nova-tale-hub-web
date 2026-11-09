@@ -1,3 +1,4 @@
+import { Select as UiSelect } from "@/components/ui";
 // ═══════════════════════════════════════════════════════════════════════════════════
 // src/pages/team/shared.tsx — 团队页签共用的小组件
 // ═══════════════════════════════════════════════════════════════════════════════════
@@ -245,40 +246,6 @@ export function SearchBox({ value, onChange, placeholder, width = 220 }: {
   );
 }
 
-/** 模态遮罩容器 */
-export function ModalShell({ onClose, children, width = 460 }: {
-  onClose: () => void;
-  children: ReactNode;
-  width?: number;
-}) {
-  return (
-    <div
-      onClick={onClose}
-      style={{
-        position: "fixed", inset: 0, zIndex: 1000,
-        background: "rgba(0,0,0,.7)", backdropFilter: "blur(8px)",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        padding: 20,
-      }}
-    >
-      <div
-        onClick={e => e.stopPropagation()}
-        style={{
-          width, maxWidth: "100%",
-          background: colors.bgSecondary,
-          border: `1px solid ${colors.borderStrong}`,
-          borderRadius: 20,
-          boxShadow: "0 30px 80px rgba(0,0,0,.6)",
-          overflow: "hidden",
-          maxHeight: "88vh", display: "flex", flexDirection: "column",
-        }}
-      >
-        {children}
-      </div>
-    </div>
-  );
-}
-
 /** 模态头部 */
 export function ModalHead({ title, sub, onClose }: { title: string; sub?: string; onClose: () => void }) {
   return (
@@ -342,7 +309,7 @@ export function TextInput(props: {
       value={props.value}
       onChange={e => props.onChange(e.target.value)}
       placeholder={props.placeholder}
-      autoFocus={props.autoFocus}
+      data-ui-autofocus={props.autoFocus || undefined}
       style={{
         width: "100%", padding: "10px 13px", borderRadius: 10, fontSize: 13.5,
         background: colors.bgSurface,
@@ -361,18 +328,18 @@ export function Select<T extends string>(props: {
   width?: number | string;
 }) {
   return (
-    <select
+    <UiSelect
+      label="团队角色"
       value={props.value}
-      onChange={e => props.onChange(e.target.value as T)}
+      onValueChange={value => props.onChange(value as T)}
       style={{
         width: props.width ?? "100%", padding: "9px 12px", borderRadius: 10, fontSize: 12.5,
         background: colors.bgSurface,
         border: `1px solid ${colors.borderStrong}`,
         color: colors.textPrimary, outline: "none", boxSizing: "border-box",
       }}
-    >
-      {props.options.map(o => <option key={o} value={o}>{o}</option>)}
-    </select>
+      options={props.options.map(o => ({ value: o, label: o }))}
+    />
   );
 }
 

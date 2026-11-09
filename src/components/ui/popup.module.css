@@ -1,0 +1,20 @@
+:global(#root) .surface[data-ui-popup] {
+  position: relative;
+  inset: auto;
+  max-height: min(400px, var(--radix-popper-available-height, calc(100vh - 16px)));
+  overflow: auto;
+  padding: 5px;
+}
+
+:global(#root) .pointAnchor {
+  position: fixed;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+:global(#root) .pointBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1599;
+}

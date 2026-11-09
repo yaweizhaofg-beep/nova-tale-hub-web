@@ -1,9 +1,11 @@
+import { ModalShell } from "@/components/ui";
+import { Select } from "@/components/ui";
 import { useState } from "react";
 import { ALL_TASKS } from "../records";
 import type { SpaceKind } from "../billing";
 import { colors, TEAM_OWNER_ID } from "../shared";
 import type { Nav } from "../shared";
-import { GhostBtn, ModalShell, ModalHead, ModalFoot } from "../pages/team/shared";
+import { GhostBtn, ModalHead, ModalFoot } from "../pages/team/shared";
 
 export function notificationTasks(scope: SpaceKind) {
   return ALL_TASKS.filter(task => task.space === scope && (scope === "team" || task.memberId === TEAM_OWNER_ID))
@@ -23,15 +25,18 @@ export default function TaskNotifications({ scope, readIds, onRead, onClose, nav
   const unread = tasks.filter(task => !readIds.has(keyOf(task.taskId))).length;
 
   return (
-    <ModalShell onClose={onClose} width={680}>
-      <div role="dialog" aria-modal="true" aria-label="任务通知">
+    <ModalShell label="任务通知" onClose={onClose} width={680}>
+      <div>
         <ModalHead title="消息通知" sub={`任务 · ${unread} 条未读`} onClose={onClose} />
         <div style={{ padding: "12px 20px", display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
           <strong style={{ color: colors.accent, fontSize: 13 }}>任务</strong>
-          <select aria-label="通知筛选" value={filter} onChange={event => setFilter(event.target.value)}
-            style={{ marginLeft: "auto", padding: 7, borderRadius: 8, background: colors.bgSecondary, border: `1px solid ${colors.border}`, color: colors.textPrimary }}>
-            <option value="all">全部任务</option><option value="error">报错任务</option>
-          </select>
+          <Select
+            label="通知筛选"
+            value={filter}
+            onValueChange={value => setFilter(value)}
+            style={{ marginLeft: "auto", padding: 7, borderRadius: 8, background: colors.bgSecondary, border: `1px solid ${colors.border}`, color: colors.textPrimary }}
+            options={[{ value: "all", label: "全部任务" }, { value: "error", label: "报错任务" }]}
+          />
         </div>
         <div style={{ maxHeight: "58vh", overflowY: "auto", padding: "0 20px 16px" }}>
           {shown.length === 0 && <p style={{ color: colors.textMuted, fontSize: 12 }}>暂无任务通知</p>}

@@ -1,10 +1,13 @@
+import { TEAM_ROLES } from "@/enums/team-role";
+import { ModalShell } from "@/components/ui";
+import { useWalletSnapshot } from "@/features/billing/wallet-query";
 // ═══════════════════════════════════════════════════════════════════════════════════
 // src/pages/team/MembersTab.tsx — 成员管理页签
 //
 // 席位用量、成员列表与移除历史
 // ═══════════════════════════════════════════════════════════════════════════════════
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Plus, Settings, Trash2, UserPlus, History } from "lucide-react";
 import { colors, ROLE_STYLE, TEAM_OWNER_ID } from "../../shared";
 import type { TeamRole } from "../../shared";
@@ -20,7 +23,7 @@ import {
 } from "../../billing";
 import {
   Panel, Tag, PrimaryBtn, GhostBtn, Empty, TableHead, TableScroll,
-  LinkBtn, SearchBox, ModalShell, ModalHead, ModalFoot, Field, TextInput, Select, RoleBadge,
+  LinkBtn, SearchBox, ModalHead, ModalFoot, Field, TextInput, Select, RoleBadge,
 } from "./shared";
 
 // ─── 席位状态展示 ─────────────────────────────────────────────────────────────
@@ -53,7 +56,7 @@ function InviteModal({ onClose, onToast }: { onClose: () => void; onToast: (m: s
   };
 
   return (
-    <ModalShell onClose={onClose}>
+    <ModalShell label="邀请成员" onClose={onClose}>
       <ModalHead
         title="邀请成员"
         sub="演示流程：按账号模拟成员加入工作室"
@@ -124,7 +127,7 @@ function RemoveModal({ member, onClose, onDone }: {
   };
 
   return (
-    <ModalShell onClose={onClose} width={420}>
+    <ModalShell label="移除成员" onClose={onClose} width={420}>
       <ModalHead title={`移除成员 · ${member.name}`} sub="此操作需要二次确认" onClose={onClose} />
       <div style={{ padding: "18px 22px", fontSize: 13, color: colors.textSecondary, lineHeight: 1.75 }}>
         {isCreator ? (
@@ -163,6 +166,7 @@ export default function MembersTab({
   onOpenUsage: (memberId?: number) => void;
   onToast: (m: string, k?: "ok" | "err") => void;
 }) {
+  const walletState = useWalletSnapshot();
   const [quotaTarget, setQuotaTarget] = useState<TeamMember | null>(null);
   const [showInvite, setShowInvite] = useState(false);
   const [removeTarget, setRemoveTarget] = useState<TeamMember | null>(null);
@@ -183,7 +187,7 @@ export default function MembersTab({
     return m.name.toLowerCase().includes(k) || m.account.toLowerCase().includes(k);
   };
 
-  const filtered = useMemo(() => members.filter(filter), [members, kw]);
+  const filtered = members.filter(filter);
   const onlineCount = members.filter(m => m.online).length;
 
   const handleRoleSave = (id: number) => {
@@ -254,8 +258,8 @@ export default function MembersTab({
           ) : filtered.map((m, i) => {
             const rs = ROLE_STYLE[m.role] ?? { bg: colors.bgHover, color: colors.textMuted };
             const isCreator = m.id === TEAM_OWNER_ID;
-            const a = getAllocation(m.id);
-            const avail = getMemberAvailable(m.id);
+            const a = getAllocation(walletState, m.id);
+            const avail = getMemberAvailable(walletState, m.id);
             return (
               <div key={m.id} style={{
                 display: "grid", gridTemplateColumns: "2fr 0.8fr 0.7fr 0.7fr 0.9fr 1fr 0.9fr 140px",
@@ -295,7 +299,7 @@ export default function MembersTab({
                 <div>
                   {editId === m.id ? (
                     <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                      <Select value={editRole} onChange={setEditRole} options={["管理员", "导演", "编剧", "制作人"] as const} />
+                      <Select value={editRole} onChange={setEditRole} options={TEAM_ROLES} />
                       <div style={{ display: "flex", gap: 6 }}>
                         <button onClick={() => handleRoleSave(m.id)} style={{
                           fontSize: 12, color: colors.accent, background: colors.accentDim,
@@ -378,7 +382,7 @@ export default function MembersTab({
         )}
         {showRemoved && removed.map((m, i) => {
           const rs = ROLE_STYLE[m.role] ?? { bg: colors.bgHover, color: colors.textMuted };
-          const a = getAllocation(m.id);
+          const a = getAllocation(walletState, m.id);
           return (
             <div key={m.id} style={{
               display: "grid", gridTemplateColumns: "2fr 1fr 1.2fr 1.4fr",

@@ -1,3 +1,5 @@
+import { useLocation } from "react-router";
+import { usePageSearch } from "@/router/page-search";
 // ═══════════════════════════════════════════════════════════════════════════════════
 // TeamPage - 团队管理页（容器）
 //
@@ -13,10 +15,9 @@
 //   · 成员档案 / 星石管理只允许当前在席成员
 // ═══════════════════════════════════════════════════════════════════════════════════
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { colors } from "../shared";
 import type { Nav as NavType } from "../shared";
-import { subscribeWallet } from "../billing";
 import { subscribeTeam, getActiveMembers, getMemberById } from "../team";
 import { TEAM_TABS } from "./team/shared";
 import type { TeamTabId } from "./team/shared";
@@ -70,26 +71,17 @@ function Toast({ state, onClose }: { state: ToastState | null; onClose: () => vo
 // ─── 主组件 ───────────────────────────────────────────────────────────────────
 
 export default function TeamPage({ navigate }: NavType) {
-  const [tab, setTab] = useState<TeamTabId>(() => parseTab(window.location.search));
-  const [usage, setUsage] = useState<UsageRoute>(() => parseUsageRoute(window.location.search));
-  const [focusMember, setFocusMember] = useState<number | null>(() => parseFocus(window.location.search));
+  const { search } = useLocation();
+  const setSearch = usePageSearch();
+  const tab = parseTab(search);
+  const usage = useMemo(() => parseUsageRoute(search), [search]);
+  const focusMember = parseFocus(search);
+  const lastUsage = useRef<UsageRoute | null>(null);
   const [toast, setToast] = useState<ToastState | null>(null);
   const [, forceRender] = useState(0);
 
-  // 钱包 / 团队数据变化时刷新
-  useEffect(() => subscribeWallet(() => forceRender(v => v + 1)), []);
+  // 团队数据变化时刷新
   useEffect(() => subscribeTeam(() => forceRender(v => v + 1)), []);
-
-  // 浏览器前进／后退：重建同一视图
-  useEffect(() => {
-    const onPop = () => {
-      setTab(parseTab(window.location.search));
-      setUsage(parseUsageRoute(window.location.search));
-      setFocusMember(parseFocus(window.location.search));
-    };
-    window.addEventListener("popstate", onPop);
-    return () => window.removeEventListener("popstate", onPop);
-  }, []);
 
   const onToast = useCallback((msg: string, kind: "ok" | "err" = "ok") => {
     setToast({ msg, kind });
@@ -106,13 +98,14 @@ export default function TeamPage({ navigate }: NavType) {
     next: { tab?: TeamTabId; usage?: UsageRoute; focus?: number | null },
     opts?: { replace?: boolean },
   ) => {
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(search);
     params.set("page", "team");
 
     const nextTab = next.tab ?? tab;
     params.set("tab", nextTab);
 
-    const nextUsage = next.usage ?? usage;
+    const nextUsage = next.usage ?? (tab === "members" ? lastUsage.current ?? usage : usage);
+    if (nextTab === "members" && (tab === "usage" || tab === "tasks")) lastUsage.current = usage;
 
     // 用量子状态（日期、筛选、分页、任务 ID）只在用量页有意义
     const USAGE_KEYS = ["view", "task", "dfrom", "dto", "cat", "project", "model", "status", "q", "pg", "sort"];
@@ -135,22 +128,17 @@ export default function TeamPage({ navigate }: NavType) {
       else params.delete("focus");
     }
 
-    const url = "?" + params.toString();
-    if (opts?.replace) window.history.replaceState(null, "", url);
-    else window.history.pushState(null, "", url);
-  }, [tab, usage, focusMember]);
+    setSearch("?" + params.toString(), opts);
+  }, [tab, usage, focusMember, search, setSearch]);
 
   /** 切换一级页签 */
   const changeTab = useCallback((next: TeamTabId) => {
-    setTab(next);
     // 星石管理的额度弹窗只在明确点「管理额度」时打开，切换页签不自动弹出
     writeUrl({ tab: next, focus: next === "stars" ? null : undefined });
   }, [writeUrl]);
 
   const openTasks = useCallback((route: UsageRoute) => {
     const nextUsage = { ...route, view: "tasks" as const };
-    setUsage(nextUsage);
-    setTab("tasks");
     writeUrl({ tab: "tasks", usage: nextUsage });
   }, [writeUrl]);
 
@@ -176,7 +164,7 @@ export default function TeamPage({ navigate }: NavType) {
     if (next === "usage") {
       // 统一进入任务明细，带上该成员和已有日期条件
       const nextUsage: UsageRoute = {
-        ...usage,
+        ...(tab === "members" ? lastUsage.current ?? usage : usage),
         view: "tasks",
         member: memberId !== undefined ? memberId : usage.member,
         task: null,
@@ -184,11 +172,9 @@ export default function TeamPage({ navigate }: NavType) {
       };
       openTasks(nextUsage);
     } else {
-      setTab(next);
-      setFocusMember(memberId ?? null);
       writeUrl({ tab: next, focus: memberId ?? null });
     }
-  }, [openTasks, usage, writeUrl]);
+  }, [openTasks, tab, usage, writeUrl]);
 
   /** 用量子路由变化 */
   const onUsageRouteChange = useCallback((
@@ -196,7 +182,6 @@ export default function TeamPage({ navigate }: NavType) {
     opts?: { replace?: boolean },
   ) => {
     const merged: UsageRoute = { ...usage, ...next };
-    setUsage(merged);
     writeUrl({ tab: "usage", usage: merged }, opts);
   }, [usage, writeUrl]);
 

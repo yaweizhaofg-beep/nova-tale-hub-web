@@ -1,3 +1,5 @@
+import { ModalShell } from "@/components/ui";
+import { useWalletSnapshot } from "@/features/billing/wallet-query";
 // ═══════════════════════════════════════════════════════════════════════════════════
 // src/pages/team/StarsTab.tsx — 星石管理页签
 //
@@ -9,14 +11,14 @@
 import { useState } from "react";
 import { colors } from "../../shared";
 import {
-  getWallet, getTotalAllocated, getAssignableBalance, TEAM_RESERVED_STARS,
+  getTotalAllocated, getAssignableBalance, TEAM_RESERVED_STARS,
   getAllocation, getMemberAvailable,
-  setAllocationLimit,
+  setAllocationLimit, readWalletSnapshot,
 } from "../../billing";
 import type { TeamMember } from "../../team";
 import {
   Panel, Stat, PrimaryBtn, GhostBtn,
-  ModalShell, ModalHead, ModalFoot, Field, TextInput,
+  ModalHead, ModalFoot, Field, TextInput,
 } from "./shared";
 
 // ─── 额度弹窗（复用现有交互，改为方案口径）──────────────────────────────────
@@ -29,8 +31,9 @@ export function AllocationModal({ member, onClose, onToast }: {
   const [mode, setMode] = useState<"add" | "reclaim">("add");
   const [amount, setAmount] = useState("");
   const [error, setError] = useState("");
-  const available = getMemberAvailable(member.id);
-  const assignable = getAssignableBalance();
+  const walletState = useWalletSnapshot();
+  const available = getMemberAvailable(walletState, member.id);
+  const assignable = getAssignableBalance(walletState);
   const value = Number(amount);
   const limit = mode === "add" ? assignable : available;
   const valid = amount.trim() !== "" && Number.isFinite(value) && value > 0;
@@ -38,7 +41,7 @@ export function AllocationModal({ member, onClose, onToast }: {
 
   const submit = () => {
     if (!valid) { setError("请输入大于零的星石数量"); return; }
-    const current = getAllocation(member.id);
+    const current = getAllocation(readWalletSnapshot(), member.id);
     const next = mode === "add" ? current.allocated + value : current.allocated - value;
     const result = setAllocationLimit(member.id, next);
     if (!result.ok) { setError(result.reason); return; }
@@ -47,7 +50,7 @@ export function AllocationModal({ member, onClose, onToast }: {
   };
 
   return (
-    <ModalShell onClose={onClose} width={440}>
+    <ModalShell label="管理额度" onClose={onClose} width={440}>
       <ModalHead title={`管理额度 · ${member.name}`} sub="从团队待分配额度划转星石" onClose={onClose} />
       <div style={{ padding: "18px 22px" }}>
         <div style={{ display: "flex", gap: 8, marginBottom: 18 }}>
@@ -86,9 +89,10 @@ export function AllocationModal({ member, onClose, onToast }: {
 }
 
 export function TeamWallet() {
-  const wallet = getWallet("team");
-  const totalAllocated = getTotalAllocated();
-  const assignable = getAssignableBalance();
+  const walletState = useWalletSnapshot();
+  const wallet = walletState.wallets.team;
+  const totalAllocated = getTotalAllocated(walletState);
+  const assignable = getAssignableBalance(walletState);
   return (
       <Panel title="团队钱包">
         <div style={{ padding: "18px 22px" }}>

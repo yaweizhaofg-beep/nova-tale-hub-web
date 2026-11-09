@@ -1,3 +1,6 @@
+import { DEMO_REMAINING_DAYS, DEMO_EXPIRY } from "./upgrade/upgrade-demo";
+import { UpgradeConfirmModal } from "./upgrade/upgrade-confirm-modal";
+import { StorageExpandModal } from "./upgrade/storage-expand-modal";
 // ═══════════════════════════════════════════════════════════════════════════════════
 // UpgradePage - 会员套餐（个人 / 团队）
 // 保留原布局、视觉与导航；价格与权益改用 src/billing.ts 统一配置。
@@ -5,15 +8,15 @@
 // ═══════════════════════════════════════════════════════════════════════════════════
 
 import { useState } from "react";
-import { ChevronLeft, Users, User, Check, HardDrive, AlertTriangle } from "lucide-react";
+import { ChevronLeft, Users, User, Check, HardDrive } from "lucide-react";
 import { USER } from "../shared";
 import type { PageId } from "../shared";
 import {
   PLAN_PERIOD_DAYS, CONCURRENCY_DISCLAIMER, storageLabel,
   SPACE_NAMES,
   plansFor, findPlan, canUpgrade, halfPeriodUpgradeQuote,
-  computeStorageQuote, STORAGE_PRICE_PER_GB, STORAGE_MAX_GB,
-  type Plan, type PlanScope, type SpaceKind, type UpgradeQuote,
+  STORAGE_PRICE_PER_GB, STORAGE_MAX_GB,
+  type Plan, type PlanScope, type SpaceKind,
 } from "../billing";
 
 interface NavType { navigate: (p: PageId) => void; }
@@ -357,195 +360,3 @@ const DEMO_CURRENT_PLAN: Record<SpaceKind, string> = {
   personal: "personal-creator",
   team: "team-studio",
 };
-
-/** 演示：剩余天数 */
-const DEMO_REMAINING_DAYS = 21;
-
-/** 演示：到期日 */
-const DEMO_EXPIRY = "2026-11-20";
-
-// ─── 升级确认弹窗 ─────────────────────────────────────────────────────────────
-
-function UpgradeConfirmModal({ from, to, onClose, onConfirm }: {
-  from: Plan; to: Plan; onClose: () => void; onConfirm: () => void;
-}) {
-  const quote: UpgradeQuote = halfPeriodUpgradeQuote(from, to, DEMO_EXPIRY);
-  const nextPeriodPrice = to.price;
-
-  return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 500, display: "flex", alignItems: "center", justifyContent: "center",
-      background: "rgba(0,0,0,.6)", backdropFilter: "blur(8px)", padding: 24 }}
-      onClick={onClose}>
-      <div onClick={e => e.stopPropagation()}
-        style={{ background: "#13151C", border: "1px solid rgba(255,255,255,.09)", borderRadius: 18, padding: "28px 32px",
-          width: "100%", maxWidth: 520, boxShadow: "0 32px 80px rgba(0,0,0,.7)" }}>
-
-        <div style={{ fontSize: 17, fontWeight: 700, color: "white", marginBottom: 4 }}>确认升级套餐</div>
-        <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", marginBottom: 20 }}>
-          升级立即生效，原到期时间不变
-        </div>
-
-        {/* Plan transition */}
-        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18,
-          background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 12, padding: "14px 16px" }}>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 10, color: "rgba(255,255,255,.3)", marginBottom: 4 }}>原套餐</div>
-            <div style={{ fontSize: 14, fontWeight: 600, color: "rgba(255,255,255,.7)" }}>{from.name}</div>
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginTop: 2 }}>¥{from.price} · {from.stars.toLocaleString()} 积分</div>
-          </div>
-          <div style={{ fontSize: 18, color: gold }}>→</div>
-          <div style={{ flex: 1, textAlign: "right" }}>
-            <div style={{ fontSize: 10, color: "rgba(255,255,255,.3)", marginBottom: 4 }}>新套餐</div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: "white" }}>{to.name}</div>
-            <div style={{ fontSize: 11, color: gold, marginTop: 2, fontWeight: 600 }}>¥{to.price} · {to.stars.toLocaleString()} 积分</div>
-          </div>
-        </div>
-
-        {/* Quote rows */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 0, marginBottom: 18 }}>
-          {([
-            ["剩余时间", `${quote.remainingDays} 天（约 ${(quote.remainingRatio * 100).toFixed(0)}%）`],
-            ["补款", `¥${quote.topUpAmount.toFixed(2)}`],
-            ["补发积分", `+${quote.topUpStars.toLocaleString()}`],
-            ["原到期日", quote.originalExpiry],
-            ["下周期完整价格", `¥${nextPeriodPrice} / ${PLAN_PERIOD_DAYS}天`],
-          ] as const).map(([l, v], i, arr) => (
-            <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "9px 0",
-              borderBottom: i < arr.length - 1 ? "1px solid rgba(255,255,255,.05)" : "none" }}>
-              <span style={{ fontSize: 12.5, color: "rgba(255,255,255,.45)" }}>{l}</span>
-              <span style={{ fontSize: 13, fontWeight: 600, color: l === "补款" ? gold : l === "补发积分" ? "#34d399" : "rgba(255,255,255,.8)" }}>{v}</span>
-            </div>
-          ))}
-        </div>
-
-        {/* Benefit changes */}
-        <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 12,
-          padding: "12px 16px", marginBottom: 16 }}>
-          <div style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,.45)", marginBottom: 8 }}>权益变化</div>
-          {quote.benefitChanges.map(b => (
-            <div key={b.label} style={{ display: "flex", justifyContent: "space-between", fontSize: 12,
-              color: "rgba(255,255,255,.5)", marginBottom: 5 }}>
-              <span>{b.label}</span>
-              <span><span style={{ color: "rgba(255,255,255,.4)" }}>{b.from}</span>
-                <span style={{ color: "rgba(255,255,255,.25)", margin: "0 5px" }}>→</span>
-                <span style={{ color: "#34d399", fontWeight: 600 }}>{b.to}</span></span>
-            </div>
-          ))}
-        </div>
-
-        <div style={{ display: "flex", gap: 10, marginBottom: 12 }}>
-          <button onClick={onClose}
-            style={{ flex: 1, padding: "12px 0", borderRadius: 11, fontSize: 13, fontWeight: 600, cursor: "pointer",
-              background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: "rgba(255,255,255,.65)" }}>
-            取消
-          </button>
-          <button onClick={onConfirm}
-            style={{ flex: 2, padding: "12px 0", borderRadius: 11, fontSize: 13, fontWeight: 700, cursor: "pointer",
-              background: "linear-gradient(135deg,#ff8c20,#ff5010)", border: "none", color: "black" }}>
-            支付 ¥{quote.topUpAmount.toFixed(2)}，立即升级
-          </button>
-        </div>
-
-        <div style={{ display: "flex", alignItems: "flex-start", gap: 6, fontSize: 11, color: "rgba(255,255,255,.28)", lineHeight: 1.6 }}>
-          <AlertTriangle style={{ width: 12, height: 12, flexShrink: 0, marginTop: 2, color: "rgba(255,255,255,.3)" }} />
-          <span>降级将于下周期生效，当期不退差价。模拟支付为演示，不产生真实订单。</span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── 存储扩容弹窗 ─────────────────────────────────────────────────────────────
-
-function StorageExpandModal({ currentPlan, onClose, onConfirm }: {
-  currentPlan: Plan; onClose: () => void; onConfirm: () => void;
-}) {
-  const [targetGb, setTargetGb] = useState(currentPlan.storageGb * 2);
-  const currentGb = currentPlan.storageGb;
-  const quote = computeStorageQuote(currentGb, targetGb, DEMO_REMAINING_DAYS, DEMO_EXPIRY);
-  const overLimit = targetGb > STORAGE_MAX_GB;
-
-  return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 500, display: "flex", alignItems: "center", justifyContent: "center",
-      background: "rgba(0,0,0,.6)", backdropFilter: "blur(8px)", padding: 24 }}
-      onClick={onClose}>
-      <div onClick={e => e.stopPropagation()}
-        style={{ background: "#13151C", border: "1px solid rgba(255,255,255,.09)", borderRadius: 18, padding: "28px 32px",
-          width: "100%", maxWidth: 480, boxShadow: "0 32px 80px rgba(0,0,0,.7)" }}>
-
-        <div style={{ fontSize: 17, fontWeight: 700, color: "white", marginBottom: 4 }}>扩容存储</div>
-        <div style={{ fontSize: 12, color: "rgba(255,255,255,.35)", marginBottom: 20 }}>
-          ¥{STORAGE_PRICE_PER_GB.toFixed(2)} / GB / {PLAN_PERIOD_DAYS}天 · 只增加存储，不增加流量
-        </div>
-
-        {/* Current usage */}
-        <div style={{ background: "rgba(255,255,255,.03)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 12,
-          padding: "14px 16px", marginBottom: 18 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-            <span style={{ fontSize: 12, color: "rgba(255,255,255,.45)" }}>当前容量</span>
-            <span style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,.8)" }}>
-              {currentGb}GB{currentPlan.scope === "team" ? " 共享" : ""}
-            </span>
-          </div>
-          <div style={{ height: 6, borderRadius: 999, background: "rgba(255,255,255,.07)", overflow: "hidden" }}>
-            <div style={{ height: "100%", width: `${Math.min(100, (currentGb / STORAGE_MAX_GB) * 100)}%`,
-              background: "linear-gradient(90deg,#ff8c20,#ff5010)", borderRadius: 999 }} />
-          </div>
-        </div>
-
-        {/* Target */}
-        <div style={{ marginBottom: 18 }}>
-          <div style={{ fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 8 }}>目标总容量</div>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <input type="number" value={targetGb} min={currentGb} step={currentGb}
-              onChange={e => setTargetGb(Number(e.target.value) || currentGb)}
-              style={{ flex: 1, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.08)",
-                borderRadius: 10, padding: "10px 14px", fontSize: 13, color: "white", outline: "none" }} />
-            <span style={{ fontSize: 13, color: "rgba(255,255,255,.45)" }}>GB</span>
-          </div>
-          {overLimit && (
-            <div style={{ fontSize: 11, color: "#f87171", marginTop: 6 }}>超过总容量上限 {STORAGE_MAX_GB / 1024}TB</div>
-          )}
-        </div>
-
-        {/* Quote */}
-        <div style={{ background: "rgba(255,138,31,.06)", border: "1px solid rgba(255,138,31,.15)", borderRadius: 12,
-          padding: "14px 16px", marginBottom: 18 }}>
-          {([
-            ["新增容量", `${quote.addedGb} GB`],
-            ["剩余天数", `${quote.remainingDays} 天`],
-            ["到期日", quote.expiry],
-          ] as const).map(([l, v], i, arr) => (
-            <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0",
-              borderBottom: i < arr.length - 1 ? "1px solid rgba(255,255,255,.04)" : "none" }}>
-              <span style={{ fontSize: 12, color: "rgba(255,255,255,.45)" }}>{l}</span>
-              <span style={{ fontSize: 13, color: "rgba(255,255,255,.8)", fontWeight: 600 }}>{v}</span>
-            </div>
-          ))}
-          <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0 0" }}>
-            <span style={{ fontSize: 12, color: "rgba(255,255,255,.45)" }}>付款金额</span>
-            <span style={{ fontSize: 20, fontWeight: 800, color: gold }}>¥{quote.amount.toFixed(2)}</span>
-          </div>
-        </div>
-
-        <div style={{ display: "flex", gap: 10 }}>
-          <button onClick={onClose}
-            style={{ flex: 1, padding: "12px 0", borderRadius: 11, fontSize: 13, fontWeight: 600, cursor: "pointer",
-              background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: "rgba(255,255,255,.65)" }}>
-            取消
-          </button>
-          <button onClick={onConfirm} disabled={overLimit}
-            style={{ flex: 2, padding: "12px 0", borderRadius: 11, fontSize: 13, fontWeight: 700, cursor: overLimit ? "not-allowed" : "pointer",
-              background: overLimit ? "rgba(255,255,255,.1)" : "linear-gradient(135deg,#ff8c20,#ff5010)", border: "none",
-              color: overLimit ? "rgba(255,255,255,.3)" : "black" }}>
-            支付 ¥{quote.amount.toFixed(2)}，确认扩容
-          </button>
-        </div>
-
-        <div style={{ fontSize: 11, color: "rgba(255,255,255,.25)", textAlign: "center", marginTop: 12, lineHeight: 1.6 }}>
-          升级套餐时按目标容量重算扩容差额，不重复收费 · 模拟支付为演示
-        </div>
-      </div>
-    </div>
-  );
-}

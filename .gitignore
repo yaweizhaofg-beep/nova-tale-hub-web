@@ -2,6 +2,10 @@
 node_modules
 node_modules/
 
+# Browser test output
+playwright-report/
+test-results/
+
 # Build output
 dist/
 dist-electron/

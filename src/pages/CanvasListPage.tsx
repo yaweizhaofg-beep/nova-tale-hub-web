@@ -1,17 +1,22 @@
+import { ModalShell } from "@/components/ui";
+import { useLocation } from "react-router";
 import { useState } from "react";
 import { ChevronLeft, Plus } from "lucide-react";
-import { getCanvases, createCanvas } from "../canvases";
+import { useCanvasStore } from "@/features/canvas/canvas-store";
 import type { Nav } from "../shared";
 import ProjectCover from "../components/ProjectCover";
 import { colors } from "../shared";
 import type { SpaceKind } from "../billing";
-import { ModalShell, ModalHead, ModalFoot, PrimaryBtn, GhostBtn } from "./team/shared";
+import { ModalHead, ModalFoot, PrimaryBtn, GhostBtn } from "./team/shared";
 
 export default function CanvasListPage({ navigate, scope }: Nav & { scope: SpaceKind }) {
   const [query, setQuery] = useState("");
-  const [creating, setCreating] = useState(() => new URLSearchParams(window.location.search).get("create") === "1");
+  const { search } = useLocation();
+  const [creating, setCreating] = useState(() => new URLSearchParams(search).get("create") === "1");
   const [name, setName] = useState("");
-  const canvases = getCanvases(scope).filter(canvas => canvas.name.toLowerCase().includes(query.trim().toLowerCase()));
+  const createCanvas = useCanvasStore(state => state.createCanvas);
+  const allCanvases = useCanvasStore(state => state.canvases[scope]);
+  const canvases = allCanvases.filter(canvas => canvas.name.toLowerCase().includes(query.trim().toLowerCase()));
   const inputStyle = { width: "100%", maxWidth: 360, padding: "9px 12px", borderRadius: 8, boxSizing: "border-box" as const, border: `1px solid ${colors.border}`, background: colors.bgSurface, color: colors.textPrimary };
   return (
     <section style={{ padding: "24px 28px", color: colors.textPrimary }}>
@@ -35,9 +40,9 @@ export default function CanvasListPage({ navigate, scope }: Nav & { scope: Space
           <span style={{ fontSize: 12, color: colors.textMuted }}>更新于 {canvas.updated}</span>
         </button>)}
       </div>
-      {creating && <ModalShell onClose={() => setCreating(false)} width={420}>
+      {creating && <ModalShell label="新建画布" onClose={() => setCreating(false)} width={420}>
         <ModalHead title="新建画布" onClose={() => setCreating(false)} />
-        <div style={{ padding: 20 }}><label>画布名称<input autoFocus aria-label="画布名称" maxLength={80} style={{ ...inputStyle, display: "block", marginTop: 10 }}
+        <div style={{ padding: 20 }}><label>画布名称<input data-ui-autofocus aria-label="画布名称" maxLength={80} style={{ ...inputStyle, display: "block", marginTop: 10 }}
           value={name} onChange={event => setName(event.target.value)} placeholder="输入画布名称" /></label></div>
         <ModalFoot><GhostBtn onClick={() => setCreating(false)}>取消</GhostBtn>
           <PrimaryBtn disabled={!name.trim()} onClick={() => {

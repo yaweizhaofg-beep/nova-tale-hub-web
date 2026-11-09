@@ -1,3 +1,4 @@
+import { useDeferredAction } from "@/hooks/use-deferred-action";
 // ═══════════════════════════════════════════════════════════════════════════════════
 // RegisterPage - 创建账号页（1:1 还原 Figma Make LandingSection.tsx RegisterPage）
 // 字段：账号 / 密码+确认密码 / 手机号+短信验证码 / 图形验证码 / 邀请码
@@ -5,12 +6,12 @@
 // 本页为演示界面，未接真实认证服务。
 // ═══════════════════════════════════════════════════════════════════════════════════
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Eye, EyeOff, Loader2, RefreshCw,
 } from "lucide-react";
 import type { Nav } from "../shared";
-import { completeDemoLogin } from "../auth";
+import { completeDemoLogin } from "@/features/auth/demo-session";
 import { BrandPanel } from "./AuthPage";
 import { AuthMotion } from "../components/AuthMotion";
 
@@ -27,17 +28,22 @@ export function RegisterPage({ navigate }: Nav) {
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
 
+  const submit = useDeferredAction();
+  useEffect(() => {
+    if (countdown === 0) return;
+    const timer = window.setTimeout(() => setCountdown(countdown - 1), 1000);
+    return () => window.clearTimeout(timer);
+  }, [countdown]);
+
   const sendSms = () => {
+    if (countdown > 0) return;
     if (!phone.trim()) { setErr("请输入手机号"); return; }
     setCountdown(60);
-    const t = setInterval(() => setCountdown(v => {
-      if (v <= 1) { clearInterval(t); return 0; }
-      return v - 1;
-    }), 1000);
     setErr("");
   };
 
   const handleSubmit = () => {
+    if (loading) return;
     if (!account.trim())    { setErr("请填写账号"); return; }
     if (account.length < 6 || account.length > 20) { setErr("账号长度为 6–20 位字母或数字"); return; }
     if (!pw)                { setErr("请设置密码"); return; }
@@ -49,7 +55,7 @@ export function RegisterPage({ navigate }: Nav) {
     setLoading(true);
     setErr("");
     // 演示：模拟注册提交
-    setTimeout(() => {
+    submit(() => {
       setLoading(false);
       const target = completeDemoLogin("onboarding");
       navigate(target.page, target.extra);

@@ -22,7 +22,8 @@ export type TaskStatus = "成功" | "失败" | "进行中" | "排队中";
 /** 结算状态 —— 取自结算记录，与任务状态相互独立 */
 export type SettleStatus = "已结算" | "结算中" | "未结算";
 
-export type SpaceKind = "personal" | "team";
+export type { SpaceKind } from "./enums/space-kind";
+import type { SpaceKind } from "./enums/space-kind";
 
 /** 素材（参考素材 / 生成产物） */
 export interface TaskAsset {

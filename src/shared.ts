@@ -1,21 +1,7 @@
 // ─── Shared Types & Mock Data ─────────────────────────────────────────────────
 
-export type PageId =
-  | "landing" | "register" | "verify" | "onboarding"
-  | "workspace" | "projects" | "new-project"
-  | "assets" | "cost-confirm"
-  | "batch" | "result" | "delivery" | "billing"
-  | "canvas" | "tools" | "membership" | "user-center"
-  | "team" | "my-tasks" | "team-tasks" | "team-assets" | "login" | "upgrade";
-
-export interface Nav {
-  /**
-   * 跳转页面。
-   * @param p 目标页面
-   * @param extra 额外查询参数；值为 null 时删除该参数
-   */
-  navigate: (p: PageId, extra?: Record<string, string | null>) => void;
-}
+export type { Nav, PageId } from "./router/page-location";
+export { TEAM_ROLES, type TeamRole } from "./enums/team-role";
 
 // ─── Mock Data ────────────────────────────────────────────────────────────────
 export const USER = {
@@ -25,7 +11,7 @@ export const USER = {
   paidStars: 2486.0, activeStars: 59.0,
   activeStarsExpiry: "12天后（29颗即将过期）",
   teamPaidStars: 8250.0, teamActiveStars: 120.0,
-  currentSpace: "team" as "personal" | "team",
+  currentSpace: "team" as const,
 };
 
 export const STUDIO_MEMBERS = [
@@ -69,9 +55,6 @@ export const TEAM_MEMBERS_INIT = [
   { id: 4, name: "吴诗涵", account: "wu@xingyao.ai",   role: "编剧",   avatar: "吴", joined: "2026-07-28" },
   { id: 5, name: "孙轩宇", account: "sun@xingyao.ai",  role: "制作人", avatar: "孙", joined: "2026-08-05" },
 ];
-
-export const TEAM_ROLES = ["管理员", "导演", "编剧", "制作人"] as const;
-export type TeamRole = typeof TEAM_ROLES[number];
 
 export const ROLE_STYLE: Record<string, { bg: string; color: string }> = {
   "管理员":  { bg: "rgba(139,92,246,.2)",  color: "#a78bfa" },

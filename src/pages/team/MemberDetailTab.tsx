@@ -1,3 +1,4 @@
+import { useWalletSnapshot } from "@/features/billing/wallet-query";
 import { useState } from "react";
 import { colors } from "../../shared";
 import { getActiveMembers } from "../../team";
@@ -10,6 +11,7 @@ export default function MemberDetailTab({ focusMemberId, onToast }: {
   focusMemberId?: number | null;
   onToast: (message: string, kind?: "ok" | "err") => void;
 }) {
+  const walletState = useWalletSnapshot();
   const [target, setTarget] = useState<TeamMember | null>(null);
   const members = getActiveMembers();
   const cellStyle = { padding: "16px 20px", textAlign: "left" as const, borderBottom: `1px solid ${colors.border}` };
@@ -26,7 +28,7 @@ export default function MemberDetailTab({ focusMemberId, onToast }: {
           <tbody>
             {members.length === 0 && <tr><td colSpan={5} style={cellStyle}>暂无成员</td></tr>}
             {members.map(member => {
-              const allocation = getAllocation(member.id);
+              const allocation = getAllocation(walletState, member.id);
               return (
                 <tr key={member.id} style={{ background: member.id === focusMemberId ? colors.accentDim : undefined }}>
                   <td style={cellStyle}>
@@ -38,7 +40,7 @@ export default function MemberDetailTab({ focusMemberId, onToast }: {
                       <strong>{member.name}</strong>
                     </div>
                   </td>
-                  <td style={{ ...cellStyle, color: colors.success }}>{getMemberAvailable(member.id).toLocaleString()}</td>
+                  <td style={{ ...cellStyle, color: colors.success }}>{getMemberAvailable(walletState, member.id).toLocaleString()}</td>
                   <td style={cellStyle}>{allocation.allocated.toLocaleString()}</td>
                   <td style={{ ...cellStyle, color: colors.textSecondary }}>{allocation.used.toLocaleString()}</td>
                   <td style={cellStyle}><PrimaryBtn onClick={() => setTarget(member)}>管理额度</PrimaryBtn></td>

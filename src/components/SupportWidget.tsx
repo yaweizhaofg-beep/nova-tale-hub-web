@@ -1,3 +1,5 @@
+import { DismissiblePanel } from "@/components/ui";
+import { useLocation } from "react-router";
 import { useEffect, useRef, useState } from "react";
 import { X, ImagePlus } from "lucide-react";
 import { colors } from "../shared";
@@ -10,6 +12,7 @@ interface Screenshot { id: string; name: string; url: string }
 interface Feedback { id: string; kind: string; text: string; contact: string; screenshots: Screenshot[]; page: string; time: string }
 
 export default function SupportWidget({ requested, onHandled }: { requested: boolean; onHandled: () => void }) {
+  const { search } = useLocation();
   const [open, setOpen] = useState(false);
   const [kind, setKind] = useState("问题反馈");
   const [text, setText] = useState("");
@@ -44,7 +47,8 @@ export default function SupportWidget({ requested, onHandled }: { requested: boo
 
   return (
     <div style={{ position: "fixed", bottom: 20, right: 20, zIndex: 180 }}>
-      {open && <section id="support-feedback-panel" role="dialog" aria-label="客服与反馈" style={{
+      {open && <DismissiblePanel id="support-feedback-panel" label="客服与反馈" ownerId="support-feedback-trigger"
+        dismissOnOutside={false} onClose={() => setOpen(false)} contentStyle={{
         position: "absolute", right: 0, bottom: 104, width: "min(380px, calc(100vw - 24px))",
         maxHeight: "calc(100dvh - 150px)", overflowY: "auto", background: colors.bgSurface, border: `1px solid ${colors.borderStrong}`,
         borderRadius: 14, padding: 18, boxSizing: "border-box", color: colors.textPrimary, boxShadow: "0 18px 60px rgba(0,0,0,.45)",
@@ -62,7 +66,7 @@ export default function SupportWidget({ requested, onHandled }: { requested: boo
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 8 }}>{item.screenshots.map(image => <a key={image.id} href={image.url} target="_blank" rel="noreferrer"><img src={image.url} alt={image.name} style={{ width: 70, height: 52, objectFit: "cover", borderRadius: 6 }} /></a>)}</div>
         </article>) : <form onSubmit={event => {
           event.preventDefault(); if (!text.trim() || loading.current) return;
-          setFeedback(current => [{ id: crypto.randomUUID(), kind, text: text.trim(), contact: contact.trim(), screenshots: [...screenshots], page: window.location.search, time: new Date().toLocaleString("zh-CN") }, ...current]);
+          setFeedback(current => [{ id: crypto.randomUUID(), kind, text: text.trim(), contact: contact.trim(), screenshots: [...screenshots], page: search, time: new Date().toLocaleString("zh-CN") }, ...current]);
           setText(""); setScreenshots([]); setMessage("反馈已保存为本地演示记录，可在「我的反馈」查看。客服服务尚未接入。");
         }} style={{ display: "grid", gap: 12 }}>
           <label style={{ fontSize: 12 }}>{kind}<textarea aria-label="反馈内容" maxLength={3000} rows={5} style={{ ...inputStyle, display: "block", resize: "vertical", marginTop: 6 }} placeholder="描述遇到的问题或你的建议" value={text} onChange={event => setText(event.target.value)} /></label>
@@ -81,8 +85,8 @@ export default function SupportWidget({ requested, onHandled }: { requested: boo
           </button>
         </form>}
         {message && <p role="status" style={{ fontSize: 12, lineHeight: 1.7, color: colors.textSecondary }}>{message}</p>}
-      </section>}
-      <button className="support-avatar-button" onClick={() => setOpen(value => !value)} title="客服与反馈" aria-label="客服与反馈" aria-expanded={open} aria-controls="support-feedback-panel">
+      </DismissiblePanel>}
+      <button id="support-feedback-trigger" className="support-avatar-button" onClick={() => setOpen(value => !value)} title="客服与反馈" aria-label="客服与反馈" aria-expanded={open} aria-controls="support-feedback-panel">
         <span className="support-avatar-frame"><img src={supportPortrait} alt="女性客服形象" draggable={false}/></span>
         <span className="support-avatar-caption">客服</span>
       </button>

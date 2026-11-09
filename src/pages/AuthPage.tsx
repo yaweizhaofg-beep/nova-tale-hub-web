@@ -1,3 +1,4 @@
+import { useDeferredAction } from "@/hooks/use-deferred-action";
 // ═══════════════════════════════════════════════════════════════════════════════════
 // AuthPage - 登录页（单登录态，1:1 还原 Figma Make AuthPage 登录部分）
 // 路由：/login → AuthPage
@@ -9,7 +10,7 @@ import {
   Eye, EyeOff, Loader2, ArrowLeft,
 } from "lucide-react";
 import type { Nav } from "../shared";
-import { completeDemoLogin } from "../auth";
+import { completeDemoLogin } from "@/features/auth/demo-session";
 import { AuthMotion } from "../components/AuthMotion";
 
 // ─── Left Brand Panel（对齐 Make AuthPage BrandPanel） ──────────────────────────
@@ -81,11 +82,17 @@ function LoginCard({ navigate }: { navigate: Nav["navigate"] }) {
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
 
+  const submit = useDeferredAction();
   const handleLogin = () => {
+    if (loading) return;
     if (!email.trim() || !pw) { setErr("请填写邮箱和密码"); return; }
     setLoading(true); setErr("");
     // 演示：模拟登录
-    setTimeout(() => { setLoading(false); const target = completeDemoLogin(); navigate(target.page, target.extra); }, 1000);
+    submit(() => {
+      setLoading(false);
+      const target = completeDemoLogin();
+      navigate(target.page, target.extra);
+    }, 1000);
   };
 
   const inputStyle: React.CSSProperties = {

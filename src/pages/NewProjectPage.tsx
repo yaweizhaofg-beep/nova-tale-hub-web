@@ -1,3 +1,4 @@
+import { Select } from "@/components/ui";
 // ═══════════════════════════════════════════════════════════════════════════════════
 // NewProjectPage — 对齐 Figma Make NewProjectPage（App.tsx line 1170-1490）
 // 双栏布局：左侧模式卡/剧目名/上传/参数横排/开始；右侧 AI 对话
@@ -31,11 +32,9 @@ export function NewProjectPage({ navigate, onStart }: NavType & { onStart?: () =
   const ready = !!name && !!uploadedFile;
 
   const selectStyle: React.CSSProperties = {
-    height: 32, padding: "0 28px 0 10px", borderRadius: 8, fontSize: 12, fontWeight: 500,
+    height: 32, width: 149, padding: "0 28px 0 10px", borderRadius: 8, fontSize: 12, fontWeight: 500,
     background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)",
-    color: "#F4F5F7", outline: "none", cursor: "pointer", appearance: "none",
-    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236F7480' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E")`,
-    backgroundRepeat: "no-repeat", backgroundPosition: "right 9px center",
+    color: "#F4F5F7", outline: "none", cursor: "pointer",
   };
 
   return (
@@ -176,10 +175,13 @@ export function NewProjectPage({ navigate, onStart }: NavType & { onStart?: () =
               {/* 生成模型 */}
               <div style={{ display: "flex", flexDirection: "column", gap: 4, flexShrink: 0 }}>
                 <span style={{ fontSize: 10, color: "#6F7480", fontWeight: 600, letterSpacing: "0.05em", whiteSpace: "nowrap" }}>生成模型</span>
-                <select value={model} onChange={e => setModel(e.target.value)} style={selectStyle}>
-                  <option value="fast">Fast · 18.55★/镜</option>
-                  <option value="pro">Pro · 45.00★/镜</option>
-                </select>
+                <Select
+                  label="生成模型"
+                  value={model}
+                  onValueChange={value => setModel(value)}
+                  style={selectStyle}
+                  options={[{ value: "fast", label: "Fast · 18.55★/镜" }, { value: "pro", label: "Pro · 45.00★/镜" }]}
+                />
               </div>
             </div>
           </div>

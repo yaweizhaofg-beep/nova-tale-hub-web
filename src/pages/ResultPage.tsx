@@ -1,3 +1,4 @@
+import { useLocation } from "react-router";
 // ═══════════════════════════════════════════════════════════════════════════════════
 // ResultPage - 结果详情（查看/后处理）
 // 设计来源：Figma Make ResultPage (LandingSection.tsx)
@@ -8,7 +9,7 @@
 // 不带任务 ID 时沿用既有通用结果样例。
 // ═══════════════════════════════════════════════════════════════════════════════════
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Play, Download, ChevronRight, Scissors, Sparkles, RefreshCw, ArrowLeft
 } from "lucide-react";
@@ -25,25 +26,9 @@ const textMuted = "rgba(255,255,255,.45)";
 
 export default function ResultPage({ navigate, space = "team" }: NavType & { space?: "personal" | "team" }) {
   const [av, setAv] = useState(0); // active version A/B/C
-  const [taskId, setTaskId] = useState<string | null>(() => {
-    const t = new URLSearchParams(window.location.search).get("task");
-    return t || null;
-  });
-  const [from, setFrom] = useState<string | null>(() => {
-    const f = new URLSearchParams(window.location.search).get("from");
-    return f || null;
-  });
-
-  // 浏览器前进／后退时同步任务 ID
-  useEffect(() => {
-    const onPop = () => {
-      const p = new URLSearchParams(window.location.search);
-      setTaskId(p.get("task"));
-      setFrom(p.get("from"));
-    };
-    window.addEventListener("popstate", onPop);
-    return () => window.removeEventListener("popstate", onPop);
-  }, []);
+  const params = new URLSearchParams(useLocation().search);
+  const taskId = params.get("task") || null;
+  const from = params.get("from") || null;
 
   const selectedSB = STORYBOARDS.find(s => s.status === "done") ?? STORYBOARDS[0];
   const matchedTask = taskId ? getTaskById(taskId) : undefined;

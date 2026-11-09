@@ -1,3 +1,5 @@
+import { Select } from "@/components/ui";
+import { useWalletSnapshot } from "@/features/billing/wallet-query";
 // ═══════════════════════════════════════════════════════════════════════════════════
 // src/pages/team/UsageTab.tsx — 用量明细页签
 //
@@ -52,6 +54,7 @@ export default function UsageTab({
   toolbarAction?: ReactNode;
   onOpenTasks?: (route: UsageRoute) => void;
 }) {
+  const walletState = useWalletSnapshot();
   const narrow = useIsNarrow(900);
   const personal = space === "personal";
   const changeRoute = (next: Partial<UsageRoute>, opts?: { replace?: boolean }) => {
@@ -421,7 +424,7 @@ export default function UsageTab({
                       <span style={{ fontSize: 12, color: colors.textSecondary }}>{r.count}</span>
                       <span style={{ fontSize: 11.5, color: colors.textMuted }}>{r.last || "—"}</span>
                       <span style={{ fontSize: 11.5, color: colors.textMuted }}>
-                        {removed ? "—" : `${getAllocation(r.memberId).allocated.toLocaleString()}（当前值）`}
+                        {removed ? "—" : `${getAllocation(walletState, r.memberId).allocated.toLocaleString()}（当前值）`}
                       </span>
                       <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
                         <LinkBtn onClick={() => changeRoute({
@@ -447,38 +450,39 @@ export default function UsageTab({
           <div className="task-list-toolbar">
             {title && <h1 className="task-records-title">{title}</h1>}
             {!showDetailOnly && <div className="task-toolbar-actions">
-              <select aria-label="任务类型" value={route.cat}
-                onChange={e => onRouteChange({ cat: e.target.value as UsageRoute["cat"], pg: 1, task: null })}>
-                <option value="all">任务类型</option>
-                {TASK_CATEGORIES.map(category => (
-                  <option key={category} value={category}>{category === "语言模型" ? "文字生成" : category}</option>
-                ))}
-              </select>
+              <Select
+                label="任务类型"
+                value={route.cat}
+                onValueChange={value => onRouteChange({ cat: value as UsageRoute["cat"], pg: 1, task: null })}
+                options={[{ value: "all", label: "任务类型" }, ...TASK_CATEGORIES.map(category => ({ value: category, label: category === "语言模型" ? "文字生成" : category }))]}
+              />
               <SearchBox value={route.q}
                 onChange={q => onRouteChange({ q, pg: 1, task: null }, { replace: true })}
                 placeholder="搜索任务、分镜或模型" width={195} />
-              {!personal && <select aria-label="成员" value={route.member ?? ""}
-                onChange={e => onRouteChange({ member: e.target.value ? Number(e.target.value) : null, pg: 1, task: null })}>
-                <option value="">全部成员</option>
-                {allMembers.map(member => <option key={member.id} value={member.id}>
-                  {member.name}{member.seat === "removed" ? "（已移除）" : ""}
-                </option>)}
-              </select>}
-              <select aria-label="项目" value={route.project}
-                onChange={e => onRouteChange({ project: e.target.value, pg: 1, task: null })}>
-                <option value="">全部项目</option>
-                {projectNames.map(project => <option key={project} value={project}>{project}</option>)}
-              </select>
-              <select aria-label="模型" value={route.model}
-                onChange={e => onRouteChange({ model: e.target.value, pg: 1, task: null })}>
-                <option value="">全部模型</option>
-                {modelNames.map(model => <option key={model} value={model}>{model}</option>)}
-              </select>
-              <select aria-label="状态" value={route.status}
-                onChange={e => onRouteChange({ status: e.target.value as UsageRoute["status"], pg: 1, task: null })}>
-                <option value="all">全部状态</option>
-                {TASK_STATUSES.map(status => <option key={status} value={status}>{status}</option>)}
-              </select>
+              {!personal && <Select
+                label="成员"
+                value={route.member ?? ""}
+                onValueChange={value => onRouteChange({ member: value ? Number(value) : null, pg: 1, task: null })}
+                options={[{ value: "", label: "全部成员" }, ...allMembers.map(member => ({ value: member.id, label: member.name + (member.seat === "removed" ? "（已移除）" : "") }))]}
+              />}
+              <Select
+                label="项目"
+                value={route.project}
+                onValueChange={value => onRouteChange({ project: value, pg: 1, task: null })}
+                options={[{ value: "", label: "全部项目" }, ...projectNames.map(project => ({ value: project, label: project }))]}
+              />
+              <Select
+                label="模型"
+                value={route.model}
+                onValueChange={value => onRouteChange({ model: value, pg: 1, task: null })}
+                options={[{ value: "", label: "全部模型" }, ...modelNames.map(model => ({ value: model, label: model }))]}
+              />
+              <Select
+                label="状态"
+                value={route.status}
+                onValueChange={value => onRouteChange({ status: value as UsageRoute["status"], pg: 1, task: null })}
+                options={[{ value: "all", label: "全部状态" }, ...TASK_STATUSES.map(status => ({ value: status, label: status }))]}
+              />
               {standalone && <details className="task-time-filter">
                 <summary aria-label="时间筛选">
                   {from || to ? `${from ? from.slice(5) : "不限"} 至 ${to ? to.slice(5) : "不限"}` : "全部时间"}

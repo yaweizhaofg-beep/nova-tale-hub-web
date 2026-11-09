@@ -1,3 +1,5 @@
+import { useLocation } from "react-router";
+import { usePageSearch } from "@/router/page-search";
 import { useEffect, useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { getTaskById } from "../records";
@@ -9,8 +11,7 @@ import { GhostBtn } from "./team/shared";
 import { parseUsageRoute, usageRouteParams } from "./team/route";
 import type { UsageRoute } from "./team/route";
 
-function readRoute(space: SpaceKind): UsageRoute {
-  const search = window.location.search;
+function readRoute(search: string, space: SpaceKind): UsageRoute {
   const params = new URLSearchParams(search);
   const route = parseUsageRoute(search);
   const task = route.task ? getTaskById(route.task) : undefined;
@@ -26,15 +27,11 @@ function readRoute(space: SpaceKind): UsageRoute {
 export default function TaskRecordsPage({ navigate, space, embedded = false }: Nav & { space: SpaceKind; embedded?: boolean }) {
   const personal = space === "personal";
   const page = personal ? "my-tasks" : "team-tasks";
-  const [route, setRoute] = useState(() => readRoute(space));
+  const { search } = useLocation();
+  const setSearch = usePageSearch();
+  const route = readRoute(search, space);
   const [notice, setNotice] = useState("");
-  const source = new URLSearchParams(window.location.search).get("source");
-
-  useEffect(() => {
-    const sync = () => setRoute(readRoute(space));
-    window.addEventListener("popstate", sync);
-    return () => window.removeEventListener("popstate", sync);
-  }, [space]);
+  const source = new URLSearchParams(search).get("source");
 
   useEffect(() => {
     if (!notice) return;
@@ -50,12 +47,7 @@ export default function TaskRecordsPage({ navigate, space, embedded = false }: N
     params.set("dfrom", next.from);
     params.set("dto", next.to);
     if (source) params.set("source", source);
-    const search = "?" + params.toString();
-    if (window.location.search !== search) {
-      if (opts?.replace) window.history.replaceState(null, "", search);
-      else window.history.pushState(null, "", search);
-    }
-    setRoute(next);
+    setSearch("?" + params.toString(), opts);
   };
 
   return (

@@ -1,11 +1,14 @@
+import { ModalShell } from "@/components/ui";
+import { Select } from "@/components/ui";
+import { useWalletSnapshot } from "@/features/billing/wallet-query";
 import { useState } from "react";
 import { USER, TEAM_MEMBERS_INIT, TEAM_OWNER_ID, colors } from "../shared";
 import type { Nav } from "../shared";
-import { findPlan, getWallet } from "../billing";
+import { findPlan } from "../billing";
 import type { SpaceKind } from "../billing";
 import { getInvoiceRequests } from "../invoices";
 import type { InvoiceRequest } from "../invoices";
-import { Panel, PrimaryBtn, GhostBtn, ModalShell, ModalHead, ModalFoot } from "./team/shared";
+import { Panel, PrimaryBtn, GhostBtn, ModalHead, ModalFoot } from "./team/shared";
 import "./user-center.css";
 
 let contactPhone = "";
@@ -19,7 +22,7 @@ export default function UserCenterPage({ navigate, currentSpace }: Nav & { curre
   const [invoice, setInvoice] = useState<InvoiceRequest | null>(null);
   const [invoiceStatus, setInvoiceStatus] = useState("all");
   const account = TEAM_MEMBERS_INIT.find(member => member.id === TEAM_OWNER_ID)?.account ?? "";
-  const wallet = getWallet(currentSpace);
+  const wallet = useWalletSnapshot().wallets[currentSpace];
   const plan = findPlan(wallet.planId);
   const invoices = getInvoiceRequests(currentSpace).filter(item => invoiceStatus === "all" || item.status === invoiceStatus);
   const inputStyle = { border: `1px solid ${colors.border}`, background: colors.bgSecondary, color: colors.textPrimary, borderRadius: 8, padding: 10, width: "100%", boxSizing: "border-box" as const };
@@ -61,9 +64,13 @@ export default function UserCenterPage({ navigate, currentSpace }: Nav & { curre
       </Panel>}
       {tab === "我的发票" && <Panel title="我的发票" extra={<GhostBtn onClick={() => navigate("billing")}>申请开票</GhostBtn>}>
         <div className="user-center-content">
-          <label>开票状态 <select aria-label="开票状态" value={invoiceStatus} onChange={event => setInvoiceStatus(event.target.value)} style={{ ...inputStyle, width: 140 }}>
-            <option value="all">全部状态</option><option value="待开具">待开具</option>
-          </select></label>
+          <label>开票状态 <Select
+            label="开票状态"
+            value={invoiceStatus}
+            onValueChange={value => setInvoiceStatus(value)}
+            style={{ ...inputStyle, width: 140 }}
+            options={[{ value: "all", label: "全部状态" }, { value: "待开具", label: "待开具" }]}
+          /></label>
           <div className="invoice-table-scroll"><table>
             <thead><tr>{["申请时间", "发票抬头", "金额", "状态", "操作"].map(label => <th key={label}>{label}</th>)}</tr></thead>
             <tbody>{invoices.length === 0 ? <tr><td colSpan={5}>暂无发票申请，可在账单中选择订单申请开票。</td></tr> :
@@ -78,7 +85,7 @@ export default function UserCenterPage({ navigate, currentSpace }: Nav & { curre
         <p>联系电话仅作为联系资料。密码修改、手机验证和邮箱绑定需接入账号服务后开放。</p>
       </div></Panel>}
       {notice && <p role="status">{notice}</p>}
-      {invoice && <ModalShell onClose={() => setInvoice(null)} width={480}>
+      {invoice && <ModalShell label="发票申请详情" onClose={() => setInvoice(null)} width={480}>
         <ModalHead title="发票申请详情" onClose={() => setInvoice(null)} />
         <div className="user-center-content"><p>抬头　{invoice.title}</p><p>金额　¥{invoice.amount.toFixed(2)}</p><p>接收邮箱　{invoice.email}</p><p>状态　{invoice.status}</p><p>申请时间　{invoice.createdAt}</p>
           <p>关联订单</p>{invoice.orderIds.map(id => <p key={id}>{id}</p>)}
