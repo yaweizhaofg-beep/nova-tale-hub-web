@@ -1,0 +1,20 @@
+.user-center-page { max-width: 1120px; padding: clamp(12px, 2.5vw, 30px); margin: auto; }
+.user-center-heading { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.user-center-heading h1 { font-size: 24px; margin: 0; }
+.user-center-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.user-center-tabs button { border: 0; background: transparent; color: rgba(255,255,255,.6); padding: 10px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; }
+.user-center-tabs button[aria-selected=true] { color: #ff8a1f; background: rgba(255,138,31,.12); }
+.user-center-content { padding: 20px; font-size: 12px; line-height: 1.8; }
+.user-center-content p { overflow-wrap: anywhere; }
+.user-profile-identity { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
+.user-profile-identity > span { display: grid; place-items: center; width: 54px; height: 54px; border-radius: 50%; background: rgba(255,138,31,.12); color: #ff8a1f; font-size: 21px; }
+.user-profile-identity h2 { font-size: 18px; margin: 0; }
+.user-profile-identity p { margin: 4px 0 0; opacity: .6; }
+.user-profile-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 22px; }
+.user-profile-fields label { display: grid; gap: 7px; font-size: 12px; color: rgba(255,255,255,.55); }
+.user-profile-fields strong { color: white; font-size: 14px; font-weight: 500; overflow-wrap: anywhere; }
+.user-center-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
+.invoice-table-scroll { margin-top: 16px; overflow-x: auto; }
+.invoice-table-scroll table { width: 100%; min-width: 580px; border-collapse: collapse; }
+.invoice-table-scroll th,.invoice-table-scroll td { text-align: left; padding: 14px 10px; border-bottom: 1px solid rgba(255,255,255,.07); }
+.invoice-table-scroll th { font-weight: 500; opacity: .6; }

@@ -1,0 +1,38 @@
+# Dependencies (may be a symlink, so match both forms)
+node_modules
+node_modules/
+
+# Build output
+dist/
+dist-electron/
+build/*.ts
+build/*.tsx
+*.tsbuildinfo
+
+# Temp / scratch files
+tmp/
+.vite/
+*.local
+*.tmp
+
+# Secrets & local env
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials.json
+secrets.json
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.idea/
+*.swp
+
+# Logs
+*.log
+npm-debug.log*
+yarn-error.log*

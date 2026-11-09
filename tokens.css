@@ -1,0 +1,8 @@
+/* Xinghe landing tokens, scoped to the public homepage. */
+.xinghe-landing {
+ --color-paper: oklch(15% .008 45); --color-panel: oklch(19% .008 45); --color-ink: oklch(96% .005 75); --color-muted: oklch(73% .012 75); --color-accent: oklch(74% .17 55); --color-accent-ink: oklch(16% .012 45); --color-rule: oklch(95% .008 75 / .14); --color-overlay: oklch(12% .012 45 / .7);
+ --font-display: "PingFang SC", "Microsoft YaHei", sans-serif; --font-body: "Helvetica Neue", "PingFang SC", sans-serif;
+ --space-sm: 8px; --space-md: 16px; --space-lg: 24px; --space-xl: 48px; --space-section: 120px;
+ --text-display: clamp(44px,5.2vw,80px); --text-title: clamp(27px,3vw,42px); --text-body: 15px;
+ --radius-card: 16px; --radius-button: 10px; --ease-out: cubic-bezier(.2,.8,.2,1); --ease-in: cubic-bezier(.4,0,1,1); --ease-in-out: cubic-bezier(.4,0,.2,1); --dur-fast: 180ms;
+}

@@ -1,0 +1,8 @@
+.support-avatar-button { position:relative; display:flex; align-items:center; flex-direction:column; gap:0; width:72px; padding:0 0 2px; border:0; background:none; cursor:pointer; font-family:inherit; color:#fff3e7; }
+.support-avatar-frame { display:block; width:66px; height:66px; overflow:hidden; border-radius:50%; padding:3px; background:linear-gradient(145deg,#ffd3a5,#a45931); box-shadow:0 6px 28px rgba(0,0,0,.4),0 0 20px rgba(245,139,62,.08); transition:box-shadow 180ms cubic-bezier(.2,.8,.2,1); }
+.support-avatar-frame img { width:100%; height:100%; object-fit:cover; object-position:center 37%; border-radius:50%; display:block; }
+.support-avatar-caption { position:relative; z-index:1; display:block; margin-top:-8px; padding:5px 14px; border:1px solid rgba(255,190,125,.35); border-radius:24px; font-size:11px; line-height:1.2; letter-spacing:.08em; background:linear-gradient(135deg,#452b1d,#251b16); box-shadow:0 3px 12px rgba(0,0,0,.3); }
+.support-avatar-button:hover .support-avatar-frame { box-shadow:0 8px 30px rgba(0,0,0,.45),0 0 0 2px rgba(255,184,112,.25); }
+.support-avatar-button:focus-visible { outline:2px solid #ff9e4d; outline-offset:5px; border-radius:36px; }
+@media(max-width:520px) { .support-avatar-button { width:62px; } .support-avatar-frame { width:58px; height:58px; } .support-avatar-caption { font-size:10px; padding:5px 12px; } }
+@media(prefers-reduced-motion:reduce) { .support-avatar-frame { transition:none; } }

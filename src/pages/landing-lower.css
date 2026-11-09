@@ -1,0 +1,96 @@
+/* Hallmark · macrostructure: original featured grid + parallel comparison · tone: cinematic glass · anchor hue: amber */
+/* Lower homepage only; the approved hero and navigation retain their styles. */
+.xl-inspiration,.xl-pricing,.xl-footer,.xl-legal-footer {
+  --lower-surface:oklch(18% .009 280);
+  --lower-surface-raised:oklch(22% .012 280);
+  --lower-line:oklch(92% .015 280 / .1);
+  --lower-text:oklch(94% .008 75);
+  --lower-secondary:oklch(76% .013 280);
+  --lower-muted:oklch(65% .012 280);
+  --lower-amber:oklch(82% .13 65);
+  color:var(--lower-text);
+}
+.xl-inspiration,.xl-pricing { max-width:1200px; padding:80px 32px; }
+.xl-inspiration { position:relative; }
+.xl-inspiration .xl-section-heading,.xl-pricing .xl-section-heading { display:block; text-align:center; margin-bottom:36px; }
+.xl-inspiration .xl-section-heading h2,.xl-pricing .xl-section-heading h2 { font-family:"Alimama ShuHeiTi",var(--font-display); font-size:32px; font-weight:700; line-height:1.45; letter-spacing:0; }
+.xl-inspiration .xl-section-heading p,.xl-pricing .xl-section-heading p { color:var(--lower-secondary); font-size:14px; line-height:1.8; margin-top:14px; }
+.xl-inspiration > .xl-tabs { gap:6px; padding:5px; width:fit-content; max-width:100%; margin:0 auto 22px; border-radius:40px; background:var(--lower-surface); border:1px solid var(--lower-line); }
+.xl-inspiration > .xl-tabs button { min-height:40px; padding:11px 24px; color:var(--lower-secondary); background:none; border:1px solid transparent; border-radius:30px; font-size:14px; font-weight:500; }
+.xl-inspiration > .xl-tabs button[aria-selected=true] { background:linear-gradient(135deg,oklch(82% .13 65 / .18),oklch(82% .13 65 / .07)); color:var(--lower-amber); border-color:oklch(82% .13 65 / .25); box-shadow:inset 0 1px 0 oklch(95% .01 75 / .08); }
+.xl-inspiration > .xl-tabs button:not([aria-selected=true]):hover { background:var(--lower-surface-raised); color:var(--lower-text); }
+.xl-inspiration .xl-categories { gap:6px 12px; margin-bottom:30px; }
+.xl-inspiration .xl-categories button { min-height:32px; padding:7px 12px; border-color:transparent; background:none; font-size:13px; color:var(--lower-secondary); }
+.xl-inspiration .xl-categories button[aria-pressed=true] { border-color:var(--lower-line); color:var(--lower-text); background:var(--lower-surface-raised); }
+.xl-inspiration .xl-categories button:hover { color:var(--lower-amber); }
+.xl-inspiration .xl-works { grid-auto-rows:204px; gap:16px; }
+.xl-inspiration .xl-work { border-color:var(--lower-line); border-radius:16px; background:var(--lower-surface); box-shadow:0 8px 28px oklch(8% .01 280 / .12); }
+.xl-inspiration .xl-work:hover { box-shadow:0 0 0 1px oklch(82% .13 65 / .38),0 12px 30px oklch(8% .01 280 / .2); }
+.xl-inspiration .xl-work > div:first-child { width:100%; height:auto !important; aspect-ratio:3 / 4; top:50% !important; bottom:auto !important; transform:translateY(-50%); }
+.xl-inspiration .xl-work-shade { background:linear-gradient(180deg,oklch(8% .01 280 / .12),transparent 30%,oklch(8% .01 280 / .5) 65%,oklch(8% .01 280 / .94)); }
+.xl-inspiration .xl-work-tag { left:18px; top:16px; padding:5px 9px; border:1px solid oklch(95% .01 75 / .12); border-radius:6px; font-size:10px; color:oklch(93% .01 75); background:oklch(12% .01 280 / .55); backdrop-filter:blur(8px); }
+.xl-inspiration .xl-work-rank { right:18px; top:18px; font-variant-numeric:tabular-nums; font-size:12px; letter-spacing:.08em; color:oklch(95% .01 75 / .8); }
+.xl-inspiration .xl-work-caption { left:20px; right:20px; bottom:20px; }
+.xl-inspiration .xl-work-caption h3 { font-size:19px; font-weight:600; line-height:1.4; margin:0 0 10px; letter-spacing:.01em; }
+.xl-inspiration .xl-work-caption > div > span { font-size:11px; color:oklch(81% .01 75); }
+.xl-inspiration .xl-work-caption button { min-height:30px; padding:6px 11px; font-size:11px; font-weight:500; border:1px solid oklch(95% .01 75 / .2); background:oklch(95% .01 75 / .07); color:oklch(95% .01 75); border-radius:30px; backdrop-filter:blur(8px); }
+.xl-inspiration .xl-work-caption button:hover { background:oklch(95% .01 75 / .15); }
+.xl-inspiration .xl-work-featured .xl-work-caption { left:28px; right:28px; bottom:28px; }
+.xl-inspiration .xl-work-featured .xl-work-caption > small { display:block; font-size:11px; color:var(--lower-amber); margin-bottom:12px; letter-spacing:.06em; }
+.xl-inspiration .xl-work-featured h3 { font-family:"Alimama ShuHeiTi",var(--font-display); font-size:32px; margin-bottom:14px; }
+.xl-inspiration .xl-work-featured .xl-work-caption > div { gap:20px; }
+.xl-inspiration .xl-work-featured .xl-work-caption > div > span { font-size:13px; }
+.xl-inspiration .xl-work-featured .xl-work-caption button { min-height:40px; padding:10px 20px; font-size:13px; background:linear-gradient(135deg,oklch(82% .13 65 / .23),oklch(82% .13 65 / .1)); border-color:oklch(82% .13 65 / .38); color:var(--lower-amber); }
+.xl-inspiration .xl-demo-note { text-align:right; color:var(--lower-muted); font-size:11px; margin-top:16px !important; }
+.xl-inspiration .xl-empty { color:var(--lower-secondary); border-color:var(--lower-line); font-size:14px; }
+.xl-pricing { border-top:1px solid var(--lower-line); padding-top:72px; }
+.xl-pricing .xl-section-heading { margin-bottom:40px; }
+.xl-comparison-scroll { background:linear-gradient(145deg,oklch(21% .012 280),oklch(16% .008 280)); border-color:var(--lower-line); border-radius:20px; box-shadow:0 24px 80px oklch(8% .01 280 / .16),inset 0 1px 0 oklch(96% .01 280 / .035); }
+.xl-comparison { font-size:13px; line-height:1.65; }
+.xl-comparison thead { background:none; color:var(--lower-text); }
+.xl-comparison th,.xl-comparison td { padding:18px 12px; border-right:0; border-bottom:1px solid var(--lower-line); }
+.xl-comparison thead th { padding:28px 12px 22px; font-size:16px; font-weight:600; background:oklch(95% .01 280 / .015); vertical-align:top; }
+.xl-comparison thead th:first-child { color:var(--lower-secondary); font-size:13px; font-weight:400; vertical-align:middle; }
+.xl-comparison thead th > span { display:block; }
+.xl-comparison thead th > small { display:block; margin-top:8px; color:var(--lower-secondary); font-size:11px; font-weight:400; }
+.xl-comparison tbody th { padding-left:24px; text-align:left; font-size:12px; font-weight:450; color:var(--lower-secondary); background:oklch(95% .01 280 / .015); }
+.xl-comparison tbody td { color:oklch(84% .01 280); font-size:13px; }
+.xl-comparison tr > :nth-child(4) { background:oklch(80% .1 65 / .045); }
+.xl-comparison thead tr > :nth-child(4) { color:var(--lower-amber); box-shadow:inset 0 2px 0 oklch(82% .13 65 / .75); }
+.xl-comparison-price td { padding-block:24px; font-size:29px !important; letter-spacing:-.025em; font-variant-numeric:tabular-nums; }
+.xl-comparison-price td:nth-child(4) { color:var(--lower-amber) !important; }
+.xl-comparison-price small { display:block; color:var(--lower-secondary); font-size:11px; letter-spacing:0; margin-top:3px; }
+.xl-comparison-actions td { padding:22px 14px 28px; }
+.xl-comparison-actions button { min-height:36px; width:100%; max-width:150px; padding:10px 12px; border-color:oklch(95% .01 280 / .18); color:var(--lower-text); border-radius:30px; background:oklch(95% .01 280 / .035); font-size:12px; }
+.xl-comparison-actions td:nth-child(4) button { color:var(--lower-amber); border-color:oklch(82% .13 65 / .4); background:oklch(82% .13 65 / .1); }
+.xl-comparison-actions button:hover { background:oklch(95% .01 280 / .1); color:var(--lower-text); }
+.xl-price-notes { margin-top:24px; color:var(--lower-secondary); font-size:13px; }
+.xl-recharge-note { padding:26px 28px; margin-bottom:36px; background:linear-gradient(110deg,oklch(82% .13 65 / .07),oklch(95% .01 280 / .025)); border:1px solid var(--lower-line); border-radius:16px; }
+.xl-price-notes h3 { font-family:var(--font-body); font-size:16px; font-weight:550; color:var(--lower-text); margin-bottom:10px; }
+.xl-recharge-note p { line-height:1.9; font-size:13px; }
+.xl-recharge-note strong { color:var(--lower-amber); font-size:15px; font-weight:550; }
+.xl-recharge-note > button { min-height:36px; padding:10px 16px; border:1px solid oklch(95% .01 280 / .18); border-radius:30px; font-size:12px; color:var(--lower-text); }
+.xl-recharge-note > button:hover { background:var(--lower-surface-raised); }
+.xl-price-notes > h3 { font-size:14px; color:var(--lower-secondary); }
+.xl-price-notes ul { display:grid; grid-template-columns:1fr 1fr; gap:12px 40px; padding-left:18px; }
+.xl-price-notes li { margin:0; font-size:12px; line-height:1.9; padding-left:4px; }
+.xl-price-notes li::marker { color:oklch(67% .025 280); font-size:8px; }
+.xl-footer { max-width:1200px; margin:0 auto; padding:36px 32px; border-color:var(--lower-line); }
+.xl-footer .xl-brand > span { font-size:16px; font-weight:550; }
+.xl-footer .xl-brand img { width:36px; height:36px; }
+.xl-footer .xl-brand small { color:var(--lower-secondary); font-size:9px; letter-spacing:.17em; }
+.xl-footer > span { color:var(--lower-muted); font-size:11px; }
+.xl-footer > button { font-size:12px; color:var(--lower-secondary); min-height:36px; padding:10px 14px; border:1px solid var(--lower-line); border-radius:30px; }
+.xl-legal-footer { max-width:1136px; padding:26px 0 36px; border-color:var(--lower-line); color:var(--lower-muted); font-size:11px; }
+.xl-legal-links { margin-bottom:16px; gap:8px 18px; }
+.xl-legal-links button { color:var(--lower-secondary); font-size:11px; }
+.xl-legal-registration,.xl-legal-company { gap:8px 18px; margin-bottom:8px; }
+.xl-legal-example { color:var(--lower-muted); font-size:10px; margin-top:14px !important; }
+@media(max-width:850px) { .xl-inspiration,.xl-pricing { padding-block:64px; } .xl-inspiration .xl-work-caption h3 { font-size:18px; } .xl-price-notes ul { gap:12px 28px; } .xl-legal-footer { margin-inline:32px; } }
+@media(max-width:520px) { .xl-inspiration,.xl-pricing { padding:52px 24px; } .xl-inspiration .xl-section-heading h2,.xl-pricing .xl-section-heading h2 { font-size:25px; } .xl-inspiration .xl-section-heading p,.xl-pricing .xl-section-heading p { font-size:12px; } .xl-inspiration > .xl-tabs { gap:2px; padding:4px; flex-wrap:nowrap; } .xl-inspiration > .xl-tabs button { padding:10px 12px; font-size:12px; min-height:38px; gap:5px; } .xl-inspiration > .xl-tabs button svg { width:14px; } .xl-inspiration .xl-categories { gap:4px; margin-bottom:24px; } .xl-inspiration .xl-categories button { font-size:11px; padding:7px 10px; } .xl-inspiration .xl-works { grid-auto-rows:196px; gap:12px; } .xl-inspiration .xl-work-caption { left:14px; right:14px; bottom:16px; } .xl-inspiration .xl-work-caption h3 { font-size:16px; margin-bottom:10px; } .xl-inspiration .xl-work-caption button { font-size:10px; padding:6px 9px; } .xl-inspiration .xl-work-featured h3 { font-size:28px; } .xl-inspiration .xl-work-tag { top:12px; left:12px; font-size:9px; padding:4px 6px; } .xl-inspiration .xl-work-rank { right:12px; top:14px; font-size:10px; } .xl-recharge-note { padding:22px; gap:18px; margin-bottom:28px; } .xl-price-notes ul { grid-template-columns:1fr; gap:12px; } .xl-price-notes li { font-size:12px; } .xl-footer { padding:28px 24px; gap:20px; } .xl-footer > span { order:3; width:100%; font-size:10px; } .xl-footer > button { margin-left:auto; } .xl-legal-footer { margin-inline:24px; padding:24px 0 80px; font-size:10px; } .xl-legal-links { gap:8px 12px; } .xl-legal-links button { font-size:10px; } }
+@media(prefers-reduced-motion:reduce) { .xl-inspiration .xl-work { transition:none; } }
+
+/* Champagne gold wordmark paired with the original mark. */
+.xinghe-landing .xl-brand > span { color:#eed9ac; font-weight:600; text-shadow:0 1px 0 rgba(69,43,14,.5); }
+.xinghe-landing .xl-brand small { color:#bbaa89; letter-spacing:.22em; }
+.xinghe-landing .xl-brand > img { box-shadow:0 2px 12px rgba(0,0,0,.22); }

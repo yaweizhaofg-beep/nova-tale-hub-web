@@ -1,0 +1,11 @@
+/* A custom wordmark rhythm with reversible pointer-driven ink particles. */
+.xl-hero h1.xl-story-title { position:relative; display:flex; align-items:baseline; justify-content:center; gap:0; isolation:isolate; width:fit-content; max-width:100%; margin:0 auto; white-space:nowrap; font-family:"Alimama ShuHeiTi",var(--font-display); font-weight:700; font-size:clamp(22px,4.35vw,64px); line-height:1.4; letter-spacing:0; }
+.xl-hero .xl-story-title > .xl-story-word { display:inline-flex; margin:0; font:inherit; letter-spacing:0; color:var(--color-ink); }
+.xl-hero .xl-story-title > .xl-story-second { color:var(--color-accent); }
+.xl-story-glyph { display:inline-block; position:relative; font:inherit; color:inherit; padding-inline:.012em; }
+.xl-story-comma { padding-inline:0 .035em; }
+.xl-story-title > canvas { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; opacity:0; }
+.xl-story-title[data-particles=active] > .xl-story-word { opacity:0; }
+.xl-story-title[data-particles=active] > canvas { opacity:1; }
+@media(max-width:520px) { .xl-hero h1.xl-story-title { font-size:clamp(18px,4.45vw,24px); } .xl-story-glyph { padding-inline:0; } }
+@media(prefers-reduced-motion:reduce) { .xl-story-title > canvas { display:none; } .xl-story-title[data-particles=active] > .xl-story-word { opacity:1; } }

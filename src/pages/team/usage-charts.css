@@ -1,0 +1,28 @@
+/* Hallmark · pre-emit critique: P5 H5 E4 S5 R5 V4 */
+.usage-summary-stats { display: flex; flex-wrap: wrap; gap: 16px 36px; }
+.usage-summary-stats span { font-size: 12px; color: var(--usage-muted); }
+.usage-summary-stats strong { display: block; font-size: 23px; margin-top: 5px; color: var(--usage-text); }
+.usage-chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 370px), 1fr)); gap: 16px; }
+.usage-chart-body { padding: 18px; min-width: 0; }
+.usage-chart-body svg { width: 100%; display: block; }
+.usage-chart-body svg:focus { outline: none; }
+.usage-unit { font-size: 11px; color: var(--usage-muted); }
+.usage-donut-layout { display: grid; grid-template-columns: minmax(130px, .85fr) minmax(0, 1fr); gap: 18px; align-items: center; }
+.usage-legend { margin: 12px 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 10px 22px; }
+.usage-legend li { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; font-size: 11px; color: var(--usage-secondary); min-width: 0; overflow-wrap: anywhere; }
+.usage-legend i { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.usage-legend strong { font-weight: 500; color: var(--usage-text); }
+.usage-donut-layout .usage-legend { display: grid; gap: 12px; }
+.usage-chart-empty { padding: 48px 18px; text-align: center; color: var(--usage-muted); font-size: 12px; }
+@media (max-width: 520px) {
+  .usage-donut-layout { grid-template-columns: minmax(0, 1fr); }
+  .usage-donut-layout svg { max-width: 200px; margin: auto; }
+}
+
+.usage-summary { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+.usage-project-picker { font-size: 12px; color: var(--usage-secondary); }
+.usage-project-picker summary { cursor: pointer; }
+.usage-project-picker > div { display: flex; flex-wrap: wrap; gap: 8px 14px; padding-top: 10px; max-width: 320px; }
+.usage-project-picker label { display: flex; align-items: center; gap: 4px; }
+.usage-project-picker button { cursor: pointer; background: transparent; color: inherit; border: 1px solid currentColor; border-radius: 5px; font-size: 11px; }

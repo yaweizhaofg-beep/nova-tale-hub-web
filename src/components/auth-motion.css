@@ -1,0 +1,45 @@
+/* Cinematic auth background shared by login and registration. */
+.auth-layout { position: relative; isolation: isolate; }
+.auth-brand { background: transparent; }
+.auth-form { position: relative; background: transparent; }
+.auth-motion { position: fixed; inset: 0; overflow: hidden; z-index: -1; background: #151014; }
+.auth-motion-scene { position: absolute; inset: 0; overflow: hidden; opacity: 0; animation: auth-scene 24s linear infinite; }
+.auth-motion-scene img { position: absolute; width: 200%; max-width: none; height: 200%; object-fit: fill; animation: auth-camera 24s linear infinite; }
+.auth-motion-shade { position: absolute; inset: 0; background: linear-gradient(180deg,rgba(5,5,8,.42),rgba(5,5,8,.4) 25%,rgba(5,5,8,.7) 68%,rgba(5,5,8,.9)); }
+.auth-motion--paused .auth-motion-scene, .auth-motion--paused img { animation-play-state: paused; }
+.auth-motion-control { position: fixed; z-index: 3; left: 50%; transform: translateX(-50%); bottom: 24px; display: flex; align-items: center; gap: 6px; padding: 8px 12px; border: 1px solid rgba(255,255,255,.25); border-radius: 24px; color: white; background: rgba(0,0,0,.4); cursor: pointer; font-size: 12px; }
+.auth-motion-control:hover { background: rgba(0,0,0,.7); }
+.auth-motion-control:focus-visible { outline: 2px solid #ff8c20; outline-offset: 4px; }
+@keyframes auth-scene { 0% { opacity: 0; } 6%,25% { opacity: 1; } 31%,100% { opacity: 0; } }
+@keyframes auth-camera { from { transform: scale(1.02) translate(0,0); } to { transform: scale(1.12) translate(-1%,1%); } }
+@media (max-width: 900px) { .auth-layout { flex-direction: column; } .auth-brand { min-height: 320px !important; flex: none !important; padding: 28px 24px !important; gap: 40px; } .auth-brand h1 { font-size: 36px !important; } .auth-brand p, .auth-brand .auth-brand-stats, .auth-brand .auth-brand-footer { display: none !important; } .auth-layout > .auth-form { min-height: auto !important; width: 100%; padding: 100px 24px 40px !important; } }
+@media (prefers-reduced-motion: reduce) { .auth-motion-scene, .auth-motion-scene img { animation: none; } .auth-motion-scene:first-child { opacity: 1; } .auth-motion-control { display: none; } }
+
+.auth-form > div { backdrop-filter: blur(16px); }
+
+.auth-home-link:hover { background: rgba(0,0,0,.5) !important; }
+.auth-home-link:focus-visible { outline: 2px solid #ff8c20; outline-offset: 4px; }
+
+/* The same live scene as the homepage, with a faint warm light wash. */
+.auth-motion { background:#100e0d; }
+.auth-motion-video { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+.auth-motion-shade { background:radial-gradient(ellipse at 12% 25%,rgba(255,132,48,.12),transparent 55%),radial-gradient(ellipse at 92% 8%,rgba(232,103,35,.07),transparent 48%),linear-gradient(180deg,rgba(5,5,8,.48),rgba(5,5,8,.55) 50%,rgba(5,5,8,.9)); }
+.auth-motion-control:disabled { opacity:.55; cursor:not-allowed; }
+
+/* A centered, compact login composition over the full-bleed scene. */
+.auth-login-layout { display:grid !important; grid-template-columns:minmax(0,1fr) 420px; align-items:center; gap:72px; width:100%; max-width:1120px; margin:0 auto; padding:110px 32px 100px; box-sizing:border-box; }
+.auth-login-layout .auth-brand { position:static !important; min-height:0 !important; padding:0 !important; justify-content:center !important; overflow:visible; }
+.auth-login-layout .auth-home-link { position:absolute !important; left:32px; top:30px; }
+.auth-login-layout .auth-brand-copy { max-width:none !important; }
+.auth-login-layout .auth-brand-copy > div:first-child { margin-bottom:22px !important; }
+.auth-login-layout .auth-brand-copy h1 { font-size:46px !important; line-height:1.2 !important; margin-bottom:22px !important; }
+.auth-login-layout .auth-brand-copy > p { font-size:15px !important; line-height:1.85 !important; margin-bottom:28px !important; max-width:445px; }
+.auth-login-layout .auth-brand-stats { gap:36px !important; }
+.auth-login-layout .auth-brand-footer { position:absolute !important; bottom:30px; left:32px; font-size:11px !important; }
+.auth-login-layout .auth-form { position:static !important; min-height:0 !important; padding:0 !important; }
+.auth-login-topbar { top:30px !important; right:32px !important; gap:12px !important; backdrop-filter:none !important; }
+.auth-login-layout .auth-login-card { box-sizing:border-box; width:100% !important; padding:32px !important; border-radius:22px !important; background:linear-gradient(145deg,rgba(24,24,33,.95),rgba(17,18,25,.96)) !important; border-color:rgba(255,217,183,.12) !important; box-shadow:0 24px 70px rgba(0,0,0,.38) !important; }
+.auth-login-card > div:first-child { margin-bottom:24px !important; }
+.auth-login-card h2 { font-size:25px !important; font-weight:600 !important; }
+@media(max-width:1000px) and (min-width:761px) { .auth-login-layout { gap:40px; grid-template-columns:minmax(0,1fr) 380px; padding-inline:32px; } .auth-login-layout .auth-brand-copy h1 { font-size:38px !important; } }
+@media(max-width:760px) { .auth-login-layout { grid-template-columns:1fr; max-width:500px; gap:32px; padding:110px 24px 100px; } .auth-login-layout .auth-brand { gap:0 !important; } .auth-login-layout .auth-brand-copy h1 { font-size:32px !important; margin-bottom:0 !important; } .auth-login-layout .auth-brand-copy > div:first-child { margin-bottom:16px !important; } .auth-login-layout .auth-home-link { left:24px; top:24px; font-size:12px !important; padding:9px 12px !important; } .auth-login-topbar { right:24px !important; top:24px !important; } .auth-login-topbar > span { display:none; } .auth-login-layout .auth-login-card { padding:28px !important; } }
