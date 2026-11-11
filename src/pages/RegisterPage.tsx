@@ -68,8 +68,6 @@ export function RegisterPage({ navigate }: Nav) {
     color: "white", outline: "none", boxSizing: "border-box",
     transition: "border-color 0.15s",
   };
-  const onFocus = (e: React.FocusEvent<HTMLInputElement>) => (e.currentTarget.style.borderColor = "rgba(255,138,31,.5)");
-  const onBlur  = (e: React.FocusEvent<HTMLInputElement>) => (e.currentTarget.style.borderColor = "rgba(255,255,255,.1)");
 
   return (
     <div className="auth-layout" style={{
@@ -113,7 +111,6 @@ export function RegisterPage({ navigate }: Nav) {
               onChange={e => setAccount(e.target.value.replace(/[^a-zA-Z0-9]/g, "").slice(0, 20))}
               placeholder="6–20位字母或数字"
               style={inputStyle}
-              onFocus={onFocus} onBlur={onBlur}
               onKeyDown={e => e.key === "Enter" && handleSubmit()}
             />
           </div>
@@ -131,7 +128,6 @@ export function RegisterPage({ navigate }: Nav) {
                   type={showPw ? "text" : "password"}
                   placeholder="8位以上"
                   style={{ ...inputStyle, paddingRight: 40 }}
-                  onFocus={onFocus} onBlur={onBlur}
                   onKeyDown={e => e.key === "Enter" && handleSubmit()}
                 />
                 <button
@@ -158,7 +154,6 @@ export function RegisterPage({ navigate }: Nav) {
                   type={showPw2 ? "text" : "password"}
                   placeholder="再次输入"
                   style={{ ...inputStyle, paddingRight: 40 }}
-                  onFocus={onFocus} onBlur={onBlur}
                   onKeyDown={e => e.key === "Enter" && handleSubmit()}
                 />
                 <button
@@ -187,7 +182,6 @@ export function RegisterPage({ navigate }: Nav) {
                 onChange={e => setPhone(e.target.value.replace(/\D/g, "").slice(0, 11))}
                 placeholder="请输入手机号"
                 style={{ ...inputStyle, flex: 1 }}
-                onFocus={onFocus} onBlur={onBlur}
                 onKeyDown={e => e.key === "Enter" && handleSubmit()}
               />
               <button
@@ -215,7 +209,6 @@ export function RegisterPage({ navigate }: Nav) {
                 onChange={e => setSmsCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
                 placeholder="短信验证码"
                 style={{ ...inputStyle, flex: 1, letterSpacing: "0.3em", fontFamily: "monospace", fontSize: 16, textAlign: "center" }}
-                onFocus={onFocus} onBlur={onBlur}
                 onKeyDown={e => e.key === "Enter" && handleSubmit()}
               />
               {/* 图形验证码（Make 中的 A8K2 样式） */}
@@ -257,7 +250,6 @@ export function RegisterPage({ navigate }: Nav) {
             <input
               placeholder="填写邀请码可获得额外奖励"
               style={inputStyle}
-              onFocus={onFocus} onBlur={onBlur}
               onKeyDown={e => e.key === "Enter" && handleSubmit()}
             />
           </div>

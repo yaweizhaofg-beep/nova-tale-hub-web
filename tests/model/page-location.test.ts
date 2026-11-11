@@ -1,6 +1,12 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { appBasePath, createPageSearch, isAppEntry, readPage } from '../../src/router/page-location';
+import {
+  appBasePath,
+  createPageSearch,
+  isAppEntry,
+  readAppPageSearch,
+  readPage,
+} from '../../src/router/page-location';
 import { resolveGuestLocation } from '../../src/features/auth/demo-session';
 
 test('guest and signed-in entry points keep the expected return target', () => {
@@ -45,4 +51,19 @@ test('the GitHub Pages entry matches the configured subpath without swallowing u
   assert.equal(isAppEntry('/nova-tale-hub-web/index.html', base), true);
   assert.equal(isAppEntry('/nova-tale-hub-web/missing', base), false);
   assert.deepEqual(resolveGuestLocation('?page=missing', false), { search: '?page=missing' });
+});
+
+test('storyboard links normalize to the app entry and strip obsolete chapter parameters', () => {
+  const base = '/nova-tale-hub-web/';
+  const search = '?storyboardId=demo&chapterId=2';
+  const target = readAppPageSearch(base + 'storyboard-shots', search, base);
+  assert.equal(target, '?storyboardId=demo&page=storyboard-shots');
+  assert.equal(readAppPageSearch(base, search + '&page=storyboard-shots', base), target);
+  assert.equal(createPageSearch(search, 'storyboard-shots', { chapterId: '4' }), target);
+  assert.deepEqual(resolveGuestLocation(target!, false), {
+    search: '?page=login',
+    returnTo: target,
+  });
+  assert.equal(createPageSearch(target!, 'projects'), '?page=projects');
+  assert.equal(readAppPageSearch(base + 'storyboard-shots/unknown', search, base), null);
 });

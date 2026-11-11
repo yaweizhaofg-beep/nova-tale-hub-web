@@ -5,21 +5,23 @@ import {
   rememberDemoDestination,
   resolveGuestLocation,
 } from '@/features/auth/demo-session';
-import { appBasePath, isAppEntry, createPageSearch, readPage, type Nav, type RoutePage } from './page-location';
+import { appBasePath, isAppEntry, createPageSearch, readAppPageSearch, readPage, type Nav, type RoutePage } from './page-location';
 
 export function usePageNavigation() {
   const location = useLocation();
   const routerNavigate = useNavigate();
   const base = import.meta.env.BASE_URL;
   const isEntry = isAppEntry(location.pathname, base);
-  const resolved = isEntry ? resolveGuestLocation(location.search, hasDemoSession()) : { search: location.search };
+  const appSearch = readAppPageSearch(location.pathname, location.search, base);
+  const resolved = appSearch === null ? { search: location.search } : resolveGuestLocation(appSearch, hasDemoSession());
+  const pathname = !isEntry && appSearch !== null ? appBasePath(base) : location.pathname;
 
   useEffect(() => {
     if (resolved.returnTo) rememberDemoDestination(resolved.returnTo);
-    if (location.search !== resolved.search) {
-      routerNavigate({ search: resolved.search, hash: location.hash }, { replace: true });
+    if (location.pathname !== pathname || location.search !== resolved.search) {
+      routerNavigate({ pathname, search: resolved.search, hash: location.hash }, { replace: true });
     }
-  }, [location.search, location.hash, resolved.search, resolved.returnTo, routerNavigate]);
+  }, [location.pathname, location.search, location.hash, pathname, resolved.search, resolved.returnTo, routerNavigate]);
 
   const navigate = useCallback<Nav['navigate']>(
     (page, extra) => {
@@ -42,6 +44,6 @@ export function usePageNavigation() {
     [location.search, location.hash, routerNavigate],
   );
   const params = new URLSearchParams(resolved.search);
-  const currentPage: RoutePage = (isEntry ? readPage(params) : null) ?? "not-found";
+  const currentPage: RoutePage = (appSearch === null ? null : readPage(params)) ?? "not-found";
   return { currentPage, params, navigate, setSearch };
 }

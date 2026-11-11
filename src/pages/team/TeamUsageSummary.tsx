@@ -1,12 +1,13 @@
+import { DateRangePicker } from "@/components/ui/date-range-picker";
 import { useState } from "react";
 import type { CSSProperties } from "react";
 import "./usage-charts.css";
 import type { TaskRecord } from "../../records";
 import { colors } from "../../shared";
-import { getTasksInRange, aggregateByMember, getDateRange, TEAM_TASK_LIST } from "../../records";
+import { getTasksInRange, aggregateByMember, getDateRange, TEAM_TASK_LIST, TODAY } from "../../records";
 import { getMemberById } from "../../team";
 import { Panel, GhostBtn } from "./shared";
-import type { UsageRoute } from "./route";
+import { defaultUsageRoute, type UsageRoute } from "./route";
 
 const format = (value: number) => value.toLocaleString("zh-CN", { maximumFractionDigits: 2 });
 
@@ -79,7 +80,6 @@ export default function TeamUsageSummary({ route, onChange, onOpenTasks }: {
   const memberPeak = Math.max(1, ...days.map(day => memberSeries.reduce((sum, member) => sum + (member.byDay.get(day) ?? 0), 0)));
   const visibleProjects = selectedProjects === null ? projectSeries : projectSeries.filter(project => selectedProjects.includes(project.key));
   const projectPeak = Math.max(1, ...visibleProjects.flatMap(project => [...project.byDay.values()]));
-  const inputStyle = { padding: "7px 10px", borderRadius: 8, border: `1px solid ${colors.border}`, background: colors.bgSecondary, color: colors.textPrimary, fontSize: 12, colorScheme: "dark" };
   const cellStyle = { padding: "12px 18px", textAlign: "left" as const, borderBottom: `1px solid ${colors.border}` };
 
   return (
@@ -88,11 +88,12 @@ export default function TeamUsageSummary({ route, onChange, onOpenTasks }: {
     } as CSSProperties}>
       <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
         <strong style={{ fontSize: 14, color: colors.textPrimary, marginRight: "auto" }}>用量统计</strong>
-        <input aria-label="开始日期" type="date" style={inputStyle} value={route.from} max={route.to}
-          onChange={event => event.target.value && onChange({ from: event.target.value })} />
-        <span style={{ fontSize: 12, color: colors.textMuted }}>至</span>
-        <input aria-label="结束日期" type="date" style={inputStyle} value={route.to} min={route.from}
-          onChange={event => event.target.value && onChange({ to: event.target.value })} />
+        <DateRangePicker
+          value={{ from: route.from, to: route.to }}
+          maxDate={TODAY}
+          resetRange={defaultUsageRoute()}
+          onChange={onChange}
+        />
       </div>
       <div className="usage-summary-stats">
         {[["已结算消耗", format(total) + " 星石"], ["任务数", tasks.length + " 条"], ["使用成员", rows.length + " 人"]].map(([label, value]) => (

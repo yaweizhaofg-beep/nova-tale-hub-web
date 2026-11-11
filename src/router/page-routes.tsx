@@ -17,6 +17,7 @@ const OnboardingPage = lazy(() =>
 const NewProjectPage = lazy(() =>
   import('@/pages/NewProjectPage').then((module) => ({ default: module.NewProjectPage })),
 );
+const StoryboardShotsPage = lazy(() => import('@/pages/storyboard/StoryboardShotsPage'));
 const UserCenterPage = lazy(() => import('@/pages/UserCenterPage'));
 const CanvasPage = lazy(() => import('@/pages/CanvasPage'));
 const CanvasListPage = lazy(() => import('@/pages/CanvasListPage'));
@@ -69,7 +70,7 @@ export function PageRoutes({ page, params, currentSpace, navigate, onSpacePick }
         path="/projects"
         element={
           params.get('kind') === 'canvas' ? (
-            <CanvasListPage key={currentSpace} navigate={navigate} scope={currentSpace} />
+            <CanvasListPage key={currentSpace} navigate={navigate} />
           ) : (
             <ProjectListPage navigate={navigate} onSpacePick={onSpacePick} />
           )
@@ -77,13 +78,22 @@ export function PageRoutes({ page, params, currentSpace, navigate, onSpacePick }
       />
       <Route path="/new-project" element={<NewProjectPage navigate={navigate} />} />
       <Route
+        path="/storyboard-shots"
+        element={
+          <StoryboardShotsPage
+            key={params.get('storyboardId')}
+            storyboardId={params.get('storyboardId')}
+            navigate={navigate}
+          />
+        }
+      />
+      <Route
         path="/canvas"
         element={
           <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
             <CanvasPage
-              key={currentSpace + ':' + (params.get('canvas') ?? 'cv0')}
+              key={currentSpace + ':' + (params.get('canvas') ?? '')}
               navigate={navigate}
-              scope={currentSpace}
             />
           </div>
         }

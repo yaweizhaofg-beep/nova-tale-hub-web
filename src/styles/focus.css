@@ -1,0 +1,5 @@
+@media (forced-colors: none) {
+  :focus-visible {
+    outline: none !important;
+  }
+}

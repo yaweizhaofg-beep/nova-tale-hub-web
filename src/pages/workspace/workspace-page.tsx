@@ -4,7 +4,8 @@ import { ChevronRight, ChevronDown, Plus, Film, PenLine, Download } from "lucide
 import ProjectCover from "@/components/ProjectCover";
 import { USER } from "@/shared";
 import { PROJECT } from "@/shared";
-import { useCanvasStore } from "@/features/canvas/canvas-store";
+import { useQuery } from "@tanstack/react-query";
+import { readCanvasSession } from "@/features/canvas/canvas-session";
 import type { Nav as NavType, PageId } from "@/router/page-location";
 const gold = "#FF8A1F";
 
@@ -12,7 +13,16 @@ export function WorkspacePage({ navigate, onSpacePick, currentSpace }: NavType &
   const [newOpen, setNewOpen] = useState(false);
   const [ccTab, setCcTab] = useState<"all" | "project" | "canvas">("all");
 
-  const CANVASES = useCanvasStore(state => state.canvases[currentSpace]);
+  const canvasSession = readCanvasSession();
+  const { data: recentCanvases = [] } = useQuery({
+    queryKey: ["canvas-recents", canvasSession?.subjectType, canvasSession?.subjectId],
+    enabled: Boolean(canvasSession),
+    queryFn: async () => {
+      const { fetchInfiniteCanvasProjects } = await import("@canvas/services/api/backend-client");
+      const projects = await fetchInfiniteCanvasProjects();
+      return projects.slice(0, 6);
+    },
+  });
   const PROJECT_STORAGE_DAYS = 5;
 
   const showProject = ccTab === "all" || ccTab === "project";
@@ -44,7 +54,7 @@ export function WorkspacePage({ navigate, onSpacePick, currentSpace }: NavType &
           <DropdownContent className="studio-workspace-menu" aria-label="开始创作" sideOffset={8} style={{ background: "#181B24", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, boxShadow: "0 20px 60px rgba(0,0,0,0.65)", padding: "6px 0", minWidth: 220 }}>
               {[
                 { label: "剧目创作", sub: "剧本 → 分集 → 资产 → 分镜", icon: Film,    color: gold,      action: () => onSpacePick("new-project") },
-                { label: "无限画布", sub: "节点编排 · 自由创作",         icon: PenLine, color: "#A78BFA", action: () => navigate("canvas") },
+                { label: "无限画布", sub: "节点编排 · 自由创作",         icon: PenLine, color: "#A78BFA", action: () => navigate("projects", { kind: "canvas", create: "1" }) },
               ].map(opt => (
                 <DropdownItem asChild key={opt.label} onSelect={opt.action}>
                   <button type="button" style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", border: "none", cursor: "pointer", textAlign: "left", transition: "background .15s" }} onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.05)")} onMouseLeave={e => (e.currentTarget.style.background = "none")}>
@@ -149,36 +159,30 @@ export function WorkspacePage({ navigate, onSpacePick, currentSpace }: NavType &
           );
         })()}
 
-        {showCanvas && CANVASES.map(cv => {
-          const tier = storageTier(cv.storageDays);
+        {showCanvas && recentCanvases.length === 0 && (
+          <button type="button" className="glass-btn" onClick={() => navigate("projects", { kind: "canvas" })}>
+            打开画布库
+          </button>
+        )}
+        {showCanvas && recentCanvases.map(cv => {
           return (
             <div key={cv.id} onClick={() => navigate("canvas", { canvas: cv.id })}
               style={{ borderRadius: 12, overflow: "hidden", cursor: "pointer",
                 background: "#13151C",
-                border: tier.urgent ? "1px solid rgba(248,113,113,0.22)" : "1px solid rgba(255,255,255,0.07)",
+                border: "1px solid rgba(255,255,255,0.07)",
                 boxShadow: "0 4px 20px rgba(0,0,0,0.35)", transition: "transform .2s, box-shadow .2s" }}
               onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 12px 36px rgba(0,0,0,0.5)"; }}
               onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.35)"; }}>
               <div style={{ width: "100%", aspectRatio: "3/4", background: "linear-gradient(160deg,#0E0A14 0%,#090610 40%,#07050D 100%)", position: "relative", overflow: "hidden" }}>
-                <ProjectCover name={cv.name} />
+                <ProjectCover name={cv.title ?? "未命名画布"} />
                 <div style={{ position: "absolute", top: 9, right: 9 }}>
                   <span style={{ fontSize: 9, fontWeight: 600, padding: "2px 6px", borderRadius: 20, background: "rgba(167,139,250,0.12)", color: "#A78BFA", border: "1px solid rgba(167,139,250,0.22)", backdropFilter: "blur(4px)" }}>画布</span>
                 </div>
-                {tier.urgent && (
-                  <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 48, background: "linear-gradient(to top, rgba(248,113,113,0.15), transparent)", pointerEvents: "none" }} />
-                )}
               </div>
               <div style={{ padding: "12px 14px 13px" }}>
-                <div style={{ fontSize: 12.5, fontWeight: 600, color: "#F4F5F7", marginBottom: 6, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{cv.name}</div>
+                <div style={{ fontSize: 12.5, fontWeight: 600, color: "#F4F5F7", marginBottom: 6, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{cv.title ?? "未命名画布"}</div>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6 }}>
-                  <span style={{ fontSize: 11, color: "#6F7480", whiteSpace: "nowrap" }}>{cv.nodes} 节点 · {cv.updated}</span>
-                  <button onClick={e => e.stopPropagation()} title="立即导出"
-                    style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 10, padding: "2px 7px", borderRadius: 20, cursor: "pointer",
-                      background: tier.bg, border: `1px solid ${tier.border}`, color: tier.color,
-                      fontWeight: tier.urgent ? 700 : 400, transition: "all .15s", whiteSpace: "nowrap", flexShrink: 0 }}>
-                    {tier.urgent && <Download style={{ width: 9, height: 9, flexShrink: 0 } as React.CSSProperties} />}
-                    {tier.label}
-                  </button>
+                  <span style={{ fontSize: 11, color: "#6F7480", whiteSpace: "nowrap" }}>{Array.isArray(cv.payload?.nodes) ? cv.payload.nodes.length : 0} 节点</span>
                 </div>
               </div>
             </div>

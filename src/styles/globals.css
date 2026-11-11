@@ -2,6 +2,9 @@
    Global Styles - 桌面软件适配
    ═══════════════════════════════════════════════════════════════════════════ */
 
+@import "./scrollbars.css";
+@import "./focus.css";
+
 /* CSS Variables */
 :root {
   --bg-primary: #0a0912;
@@ -74,25 +77,6 @@ body {
   display: flex;
   background: var(--bg-primary);
   overflow: hidden;
-}
-
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(255, 138, 31, 0.3);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 138, 31, 0.5);
 }
 
 /* Animations */
@@ -202,14 +186,6 @@ body {
   opacity: 0.4;
   transform: none;
   box-shadow: none;
-}
-
-/* Focus States */
-button:focus-visible,
-input:focus-visible,
-select:focus-visible {
-  outline: 2px solid var(--accent-primary);
-  outline-offset: 2px;
 }
 
 /* Selection */

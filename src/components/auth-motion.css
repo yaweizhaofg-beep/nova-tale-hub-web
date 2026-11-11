@@ -9,7 +9,6 @@
 .auth-motion--paused .auth-motion-scene, .auth-motion--paused img { animation-play-state: paused; }
 .auth-motion-control { position: fixed; z-index: 3; left: 50%; transform: translateX(-50%); bottom: 24px; display: flex; align-items: center; gap: 6px; padding: 8px 12px; border: 1px solid rgba(255,255,255,.25); border-radius: 24px; color: white; background: rgba(0,0,0,.4); cursor: pointer; font-size: 12px; }
 .auth-motion-control:hover { background: rgba(0,0,0,.7); }
-.auth-motion-control:focus-visible { outline: 2px solid #ff8c20; outline-offset: 4px; }
 @keyframes auth-scene { 0% { opacity: 0; } 6%,25% { opacity: 1; } 31%,100% { opacity: 0; } }
 @keyframes auth-camera { from { transform: scale(1.02) translate(0,0); } to { transform: scale(1.12) translate(-1%,1%); } }
 @media (max-width: 900px) { .auth-layout { flex-direction: column; } .auth-brand { min-height: 320px !important; flex: none !important; padding: 28px 24px !important; gap: 40px; } .auth-brand h1 { font-size: 36px !important; } .auth-brand p, .auth-brand .auth-brand-stats, .auth-brand .auth-brand-footer { display: none !important; } .auth-layout > .auth-form { min-height: auto !important; width: 100%; padding: 100px 24px 40px !important; } }
@@ -18,7 +17,6 @@
 .auth-form > div { backdrop-filter: blur(16px); }
 
 .auth-home-link:hover { background: rgba(0,0,0,.5) !important; }
-.auth-home-link:focus-visible { outline: 2px solid #ff8c20; outline-offset: 4px; }
 
 /* The same live scene as the homepage, with a faint warm light wash. */
 .auth-motion { background:#100e0d; }

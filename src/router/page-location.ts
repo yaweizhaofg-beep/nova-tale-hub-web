@@ -5,6 +5,7 @@ export const PAGES = [
   'workspace',
   'projects',
   'new-project',
+  'storyboard-shots',
   'assets',
   'cost-confirm',
   'batch',
@@ -66,6 +67,7 @@ export function createPageSearch(currentSearch: string, page: PageId, extra?: Pa
   if (!TASK_CONTEXT_PAGES.has(page)) TASK_CONTEXT_PARAMS.forEach((key) => params.delete(key));
   if (page !== 'result') params.delete('from');
   if (page !== 'canvas') params.delete('canvas');
+  if (page !== 'storyboard-shots') params.delete('storyboardId');
   if (page !== 'projects') {
     params.delete('kind');
     params.delete('create');
@@ -75,6 +77,7 @@ export function createPageSearch(currentSearch: string, page: PageId, extra?: Pa
     if (value === null) params.delete(key);
     else params.set(key, value);
   }
+  params.delete('chapterId');
   return '?' + params.toString();
 }
 
@@ -85,4 +88,18 @@ export function appBasePath(base: string) {
 export function isAppEntry(pathname: string, base: string) {
   const prefix = appBasePath(base);
   return pathname === prefix || pathname === prefix.slice(0, -1) || pathname === prefix + "index.html";
+}
+
+export function readAppPageSearch(pathname: string, search: string, base: string) {
+  if (isAppEntry(pathname, base)) {
+    const params = new URLSearchParams(search);
+    if (params.get('page') !== 'storyboard-shots' || !params.has('chapterId')) return search;
+    params.delete('chapterId');
+    return '?' + params.toString();
+  }
+  const storyboardPath = appBasePath(base) + 'storyboard-shots';
+  if (pathname === storyboardPath || pathname === storyboardPath + '/') {
+    return createPageSearch(search, 'storyboard-shots');
+  }
+  return null;
 }

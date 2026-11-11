@@ -5,7 +5,6 @@
 .xinghe-landing h1,.xinghe-landing h2,.xinghe-landing h3,.xinghe-landing p { margin:0; }
 .xinghe-landing h1,.xinghe-landing h2,.xinghe-landing h3 { font-family:var(--font-display); }
 .xinghe-landing button { font:inherit; color:inherit; cursor:pointer; border:0; background:none; display:inline-flex; align-items:center; justify-content:center; gap:var(--space-sm); line-height:1.2; transition:background-color var(--dur-fast) var(--ease-out),color var(--dur-fast) var(--ease-out); }
-.xinghe-landing button:focus-visible { outline:2px solid var(--color-accent); outline-offset:5px; }
 .xinghe-landing button:active { opacity:.8; }
 .xinghe-landing button:disabled { opacity:.55; cursor:not-allowed; filter:grayscale(1); }
 .xinghe-landing button:hover { color:var(--color-accent); }
@@ -204,7 +203,6 @@
 
 /* Five plans shown together, with aligned benefit rows. */
 .xl-comparison-scroll { width:100%; overflow-x:auto; border:1px solid var(--color-rule); border-radius:var(--radius-card); }
-.xl-comparison-scroll:focus-visible { outline:2px solid var(--color-accent); outline-offset:4px; }
 .xl-comparison { border-collapse:collapse; width:100%; min-width:1050px; table-layout:fixed; text-align:center; font-size:13px; }
 .xl-comparison caption { text-align:left; }
 .xl-comparison th,.xl-comparison td { padding:24px 12px; border-right:1px solid var(--color-rule); border-bottom:1px solid var(--color-rule); vertical-align:middle; }

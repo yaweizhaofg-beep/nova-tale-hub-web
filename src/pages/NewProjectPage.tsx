@@ -1,4 +1,5 @@
 import { Select } from "@/components/ui";
+import { createDemoStoryboard, MAX_SHOTS, MIN_SHOTS, STORYBOARD_MODELS } from "@/features/storyboard/demo-storyboard";
 // ═══════════════════════════════════════════════════════════════════════════════════
 // NewProjectPage — 对齐 Figma Make NewProjectPage（App.tsx line 1170-1490）
 // 双栏布局：左侧模式卡/剧目名/上传/参数横排/开始；右侧 AI 对话
@@ -11,17 +12,20 @@ import {
 } from "lucide-react";
 import type { Nav as NavType } from "../shared";
 
-export function NewProjectPage({ navigate, onStart }: NavType & { onStart?: () => void }) {
+const modelOptions = STORYBOARD_MODELS.map(({ value, name, unitPrice }) => ({
+  value,
+  label: `${name} · ${unitPrice.toFixed(2)}★/镜`,
+}));
+
+export function NewProjectPage({ navigate }: NavType) {
   const [name, setName]               = useState("");
-  const [model, setModel]             = useState("fast");
+  const [model, setModel]             = useState<(typeof STORYBOARD_MODELS)[number]["value"]>("fast");
   const mode = "novel" as const;
   const [uploadedFile, setUploadedFile] = useState<string | null>(null);
   const [targetShots, setTargetShots] = useState(500);
-  /** 目标分镜数范围 */
-  const MIN_SHOTS = 1;
-  const MAX_SHOTS = 5000;
+  const [submitError, setSubmitError] = useState("");
 
-  const unitPrice = model === "fast" ? 18.55 : 45.0;
+  const unitPrice = STORYBOARD_MODELS.find((option) => option.value === model)!.unitPrice;
   /** 预计消耗：目标分镜数 × 单镜价格 */
   const estStars  = Math.round(targetShots * unitPrice);
 
@@ -29,7 +33,22 @@ export function NewProjectPage({ navigate, onStart }: NavType & { onStart?: () =
     { key: "novel"  as const, icon: FileText, label: "小说 / 剧本",  sub: "AI 自动拆章生成分镜", color: "#FF8A1F", accept: ".txt,.docx,.md", hint: "支持 .txt · .docx · .md，最大 20 MB" },
   ];
   const activeMode = MODES.find(m => m.key === mode)!;
-  const ready = !!name && !!uploadedFile;
+  const projectName = name.trim();
+  const ready = !!projectName && !!uploadedFile;
+  const incompleteHint = projectName ? "请上传文件后继续" : "请先填写剧目名称";
+
+  function startSplit() {
+    if (!projectName || !uploadedFile) return;
+    let storyboardId: string;
+    try {
+      const storyboard = createDemoStoryboard({ name: projectName, fileName: uploadedFile, targetShots, model });
+      storyboardId = storyboard.id;
+    } catch {
+      setSubmitError("无法保存演示分镜，请检查浏览器存储后重试。");
+      return;
+    }
+    navigate("storyboard-shots", { storyboardId });
+  }
 
   const selectStyle: React.CSSProperties = {
     height: 32, width: 149, padding: "0 28px 0 10px", borderRadius: 8, fontSize: 12, fontWeight: 500,
@@ -68,13 +87,11 @@ export function NewProjectPage({ navigate, onStart }: NavType & { onStart?: () =
 
           {/* Project name */}
           <div style={{ flexShrink: 0 }}>
-            <label style={{ fontSize: 11, color: "#A4A8B3", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", display: "block", marginBottom: 6 }}>
+            <label htmlFor="new-project-name" style={{ fontSize: 11, color: "#A4A8B3", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", display: "block", marginBottom: 6 }}>
               剧目名称 <span style={{ color: "#F87171" }}>*</span>
             </label>
-            <input value={name} onChange={e => setName(e.target.value)} placeholder="如：《镜像》"
-              style={{ width: "100%", height: 38, padding: "0 12px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, color: "#F4F5F7", fontSize: 13.5, fontWeight: 500, outline: "none", boxSizing: "border-box", transition: "border-color .15s" }}
-              onFocus={e => { e.currentTarget.style.borderColor = "rgba(255,138,31,0.45)"; }}
-              onBlur={e =>  { e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"; }} />
+            <input id="new-project-name" value={name} onChange={e => setName(e.target.value)} placeholder="如：《镜像》"
+              style={{ width: "100%", height: 38, padding: "0 12px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9, color: "#F4F5F7", fontSize: 13.5, fontWeight: 500, outline: "none", boxSizing: "border-box", transition: "border-color .15s" }} />
           </div>
 
           {/* Upload area */}
@@ -100,7 +117,7 @@ export function NewProjectPage({ navigate, onStart }: NavType & { onStart?: () =
                     <div style={{ fontSize: 13, color: "#F4F5F7", fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{uploadedFile}</div>
                     <div style={{ fontSize: 11, color: activeMode.color, marginTop: 1, opacity: 0.8 }}>已选择 · 准备就绪</div>
                   </div>
-                  <button onClick={() => setUploadedFile(null)}
+                  <button aria-label="移除剧本" onClick={() => setUploadedFile(null)}
                     style={{ color: "#A4A8B3", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 6, cursor: "pointer", padding: "3px 7px", display: "flex", alignItems: "center" }}>
                     <X style={{ width: 12, height: 12 }} />
                   </button>
@@ -123,7 +140,7 @@ export function NewProjectPage({ navigate, onStart }: NavType & { onStart?: () =
                     <div style={{ fontSize: 13, fontWeight: 600, color: "#F4F5F7", marginBottom: 3 }}>拖拽或点击上传文件</div>
                     <div style={{ fontSize: 11, color: "#6F7480" }}>{activeMode.hint}</div>
                   </div>
-                  <input type="file" style={{ display: "none" }} accept={activeMode.accept}
+                  <input type="file" className="studio-script-input" aria-label="选择剧本文件" accept={activeMode.accept}
                     onChange={e => { const f = e.target.files?.[0]; if (f) setUploadedFile(f.name); }} />
                 </label>
               )}
@@ -144,6 +161,7 @@ export function NewProjectPage({ navigate, onStart }: NavType & { onStart?: () =
                   <div style={{ display: "flex", alignItems: "center", gap: 3, marginLeft: "auto" }}>
                     <input
                       type="number"
+                      aria-label="目标分镜数"
                       min={MIN_SHOTS} max={MAX_SHOTS} step={1} value={targetShots}
                       onChange={e => {
                         const n = Number(e.target.value);
@@ -163,7 +181,7 @@ export function NewProjectPage({ navigate, onStart }: NavType & { onStart?: () =
                       background: linear-gradient(to right, #FF8A1F ${((targetShots - MIN_SHOTS) / (MAX_SHOTS - MIN_SHOTS)) * 100}%, rgba(255,255,255,0.12) ${((targetShots - MIN_SHOTS) / (MAX_SHOTS - MIN_SHOTS)) * 100}%); }
                     .eps-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #FF8A1F; border: 2px solid #0C0D13; box-shadow: 0 0 6px rgba(255,138,31,0.5); cursor: pointer; }
                   `}</style>
-                  <input type="range" min={MIN_SHOTS} max={MAX_SHOTS} step={1} value={targetShots} onChange={e => setTargetShots(Number(e.target.value))} className="eps-slider" />
+                  <input type="range" aria-label="调整目标分镜数" min={MIN_SHOTS} max={MAX_SHOTS} step={1} value={targetShots} onChange={e => setTargetShots(Number(e.target.value))} className="eps-slider" />
                 </div>
                 <div style={{ fontSize: 10, color: "#6F7480", fontVariantNumeric: "tabular-nums" }}>
                   可选范围 {MIN_SHOTS} – {MAX_SHOTS} 个分镜
@@ -180,7 +198,7 @@ export function NewProjectPage({ navigate, onStart }: NavType & { onStart?: () =
                   value={model}
                   onValueChange={value => setModel(value)}
                   style={selectStyle}
-                  options={[{ value: "fast", label: "Fast · 18.55★/镜" }, { value: "pro", label: "Pro · 45.00★/镜" }]}
+                  options={modelOptions}
                 />
               </div>
             </div>
@@ -190,7 +208,7 @@ export function NewProjectPage({ navigate, onStart }: NavType & { onStart?: () =
           <div style={{ flexShrink: 0 }}>
             <button className="studio-create-submit"
               disabled={!ready}
-              onClick={() => { onStart?.(); navigate("team-assets"); }}
+              onClick={startSplit}
               style={{
                 width: "100%", height: 44, borderRadius: 11, fontSize: 14, fontWeight: 700,
                 color: ready ? "black" : "#A4A8B3",
@@ -208,9 +226,11 @@ export function NewProjectPage({ navigate, onStart }: NavType & { onStart?: () =
                 </span>
               )}
             </button>
-            {!ready && (
+            {submitError ? (
+              <p role="alert" style={{ color: "#fca5a5", textAlign: "center", margin: "6px 0 0" }}>{submitError}</p>
+            ) : (
               <p style={{ fontSize: 11, color: "#6F7480", textAlign: "center", marginTop: 6, marginBottom: 0 }}>
-                {!name ? "请先填写剧目名称" : "请上传文件后继续"}
+                {ready ? "演示模式 · 使用示例分镜，不扣除星石" : incompleteHint}
               </p>
             )}
           </div>

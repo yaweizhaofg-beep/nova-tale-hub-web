@@ -1,8 +1,8 @@
+import { useRef, useState, type CSSProperties } from 'react';
+import { Select as Primitive } from '@base-ui/react/select';
+import { Check, ChevronDown } from 'lucide-react';
 import floating from './floating.module.css';
-import { useState, type CSSProperties } from 'react';
 import { useEscapeDismiss } from './use-escape-dismiss';
-import * as Primitive from '@radix-ui/react-select';
-import { Check, ChevronDown, ChevronUp } from 'lucide-react';
 import styles from './select.module.css';
 
 export interface SelectOption<T extends string | number = string> {
@@ -10,6 +10,7 @@ export interface SelectOption<T extends string | number = string> {
   label: string;
   disabled?: boolean;
 }
+
 interface SelectProps<T extends string | number> {
   label: string;
   value: T;
@@ -21,6 +22,11 @@ interface SelectProps<T extends string | number> {
   id?: string;
   required?: boolean;
   placeholder?: string;
+}
+
+// A blank business value can be a selectable option, while null represents a placeholder.
+function optionKey(value: string | number) {
+  return typeof value + ':' + value;
 }
 
 export function Select<T extends string | number>({
@@ -35,21 +41,38 @@ export function Select<T extends string | number>({
   required,
   placeholder = '请选择',
 }: SelectProps<T>) {
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const [container, setContainer] = useState<HTMLElement | null>(null);
   const [open, setOpen] = useState(false);
+  const selected = options.find((option) => option.value === value);
   useEscapeDismiss(open, () => setOpen(false));
+
+  function changeOpen(next: boolean) {
+    if (next) {
+      // Keep list focus within an enclosing dialog's focus scope.
+      setContainer(
+        triggerRef.current?.closest<HTMLElement>('[role="dialog"]') ??
+          document.getElementById('root'),
+      );
+    }
+    setOpen(next);
+  }
+
   return (
-    <Primitive.Root
+    <Primitive.Root<string>
       open={open}
-      onOpenChange={setOpen}
-      value={'option:' + value}
+      onOpenChange={changeOpen}
+      value={selected ? optionKey(selected.value) : null}
+      modal={false}
       disabled={disabled}
       required={required}
       onValueChange={(next) => {
-        const option = options.find((option) => 'option:' + option.value === next);
+        const option = options.find((item) => optionKey(item.value) === next);
         if (option && !option.disabled) onValueChange(option.value);
       }}
     >
       <Primitive.Trigger
+        ref={triggerRef}
         id={id}
         style={style}
         aria-label={label}
@@ -59,51 +82,48 @@ export function Select<T extends string | number>({
         data-ui-select
       >
         <span className={styles.labels}>
-          <Primitive.Value className={styles.value} placeholder={placeholder} />
+          <Primitive.Value className={styles.value}>
+            {selected?.label ?? placeholder}
+          </Primitive.Value>
           {options.map((option) => (
-            <span key={option.value} className={styles.sizer} aria-hidden="true">
+            <span key={optionKey(option.value)} className={styles.sizer} aria-hidden="true">
               {option.label}
             </span>
           ))}
         </span>
-        <Primitive.Icon className={styles.chevron}>
+        <Primitive.Icon className={styles.chevron} aria-hidden="true">
           <ChevronDown size={12} />
         </Primitive.Icon>
       </Primitive.Trigger>
-      <Primitive.Portal
-        container={typeof document === 'undefined' ? undefined : document.getElementById('root')}
-      >
-        <Primitive.Content
-          className={[floating.surface, styles.content].join(' ')}
-          position="popper"
+      <Primitive.Portal container={container}>
+        <Primitive.Positioner
+          alignItemWithTrigger={false}
+          align="start"
           sideOffset={6}
           collisionPadding={8}
-          data-ui-popup
+          positionMethod="fixed"
+          className={styles.positioner}
         >
-          <Primitive.ScrollUpButton className={styles.scroll}>
-            <ChevronUp size={12} />
-          </Primitive.ScrollUpButton>
-          <Primitive.Viewport className={styles.viewport}>
-            {options.map((option) => (
-              <Primitive.Item
-                key={option.value}
-                value={'option:' + option.value}
-                textValue={option.label}
-                disabled={option.disabled}
-                className={[floating.item, styles.option].join(' ')}
-                data-value={String(option.value)}
-              >
-                <Primitive.ItemText>{option.label}</Primitive.ItemText>
-                <Primitive.ItemIndicator className={styles.indicator}>
-                  <Check size={13} />
-                </Primitive.ItemIndicator>
-              </Primitive.Item>
-            ))}
-          </Primitive.Viewport>
-          <Primitive.ScrollDownButton className={styles.scroll}>
-            <ChevronDown size={12} />
-          </Primitive.ScrollDownButton>
-        </Primitive.Content>
+          <Primitive.Popup className={[floating.surface, styles.content].join(' ')} data-ui-popup>
+            <Primitive.List aria-label={label} className={styles.list}>
+              {options.map((option) => (
+                <Primitive.Item
+                  key={optionKey(option.value)}
+                  value={optionKey(option.value)}
+                  label={option.label}
+                  disabled={option.disabled}
+                  className={[floating.item, styles.option].join(' ')}
+                  data-value={String(option.value)}
+                >
+                  <Primitive.ItemText>{option.label}</Primitive.ItemText>
+                  <Primitive.ItemIndicator className={styles.indicator} aria-hidden="true">
+                    <Check size={13} />
+                  </Primitive.ItemIndicator>
+                </Primitive.Item>
+              ))}
+            </Primitive.List>
+          </Primitive.Popup>
+        </Primitive.Positioner>
       </Primitive.Portal>
     </Primitive.Root>
   );

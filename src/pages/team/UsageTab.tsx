@@ -1,4 +1,5 @@
 import { Select } from "@/components/ui";
+import { DateRangePicker } from "@/components/ui/date-range-picker";
 import { useWalletSnapshot } from "@/features/billing/wallet-query";
 // ═══════════════════════════════════════════════════════════════════════════════════
 // src/pages/team/UsageTab.tsx — 用量明细页签
@@ -25,7 +26,7 @@ import {
   formatDuration, csvCell,
 } from "../../records";
 import type { SpaceKind } from "../../records";
-import { USAGE_VIEWS } from "./route";
+import { defaultUsageRoute, USAGE_VIEWS } from "./route";
 import type { UsageRoute, UsageView } from "./route";
 import TaskDetail from "./TaskDetail";
 import {
@@ -223,24 +224,10 @@ export default function UsageTab({
     </div>
   );
 
-  const dateInputs = (
-          <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-            <input aria-label="开始日期" type="date" value={from} max={to}
-              onChange={e => onRouteChange({ from: e.target.value, pg: 1, task: null })}
-              style={{
-                padding: "6px 10px", borderRadius: 8, fontSize: 12,
-                background: colors.bgSecondary, border: `1px solid ${colors.borderStrong}`,
-                color: colors.textSecondary, outline: "none",
-              }} />
-            <span style={{ fontSize: 12, color: colors.textMuted }}>至</span>
-            <input aria-label="结束日期" type="date" value={to} min={from} max={TODAY}
-              onChange={e => onRouteChange({ to: e.target.value, pg: 1, task: null })}
-              style={{
-                padding: "6px 10px", borderRadius: 8, fontSize: 12,
-                background: colors.bgSecondary, border: `1px solid ${colors.borderStrong}`,
-                color: colors.textSecondary, outline: "none",
-              }} />
-          </div>
+  const datePicker = (
+    <DateRangePicker value={{ from, to }} maxDate={TODAY}
+      resetRange={standalone ? undefined : defaultUsageRoute()}
+      onChange={range => onRouteChange({ ...range, pg: 1, task: null })} />
   );
 
   const dateControls = (
@@ -270,7 +257,7 @@ export default function UsageTab({
             })}
           </div>
 
-      {dateInputs}
+      {datePicker}
     </div>
   );
 
@@ -483,12 +470,7 @@ export default function UsageTab({
                 onValueChange={value => onRouteChange({ status: value as UsageRoute["status"], pg: 1, task: null })}
                 options={[{ value: "all", label: "全部状态" }, ...TASK_STATUSES.map(status => ({ value: status, label: status }))]}
               />
-              {standalone && <details className="task-time-filter">
-                <summary aria-label="时间筛选">
-                  {from || to ? `${from ? from.slice(5) : "不限"} 至 ${to ? to.slice(5) : "不限"}` : "全部时间"}
-                </summary>
-                <div className="task-time-options">{dateInputs}</div>
-              </details>}
+              {standalone && datePicker}
               <GhostBtn onClick={resetFilters}><RotateCcw size={12} />重置</GhostBtn>
             </div>}
             {toolbarAction}

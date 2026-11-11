@@ -100,6 +100,7 @@ export default function App() {
     currentPage !== 'onboarding' &&
     currentPage !== 'login' &&
     currentPage !== 'upgrade' &&
+    currentPage !== 'storyboard-shots' &&
     currentPage !== 'canvas';
 
   const unread = notificationTasks(currentSpace).filter(

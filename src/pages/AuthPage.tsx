@@ -101,10 +101,6 @@ function LoginCard({ navigate }: { navigate: Nav["navigate"] }) {
     color: "white", outline: "none", boxSizing: "border-box",
     transition: "border-color 0.15s",
   };
-  const inputFocus = (e: React.FocusEvent<HTMLInputElement>) =>
-    (e.currentTarget.style.borderColor = "rgba(255,138,31,.5)");
-  const inputBlur = (e: React.FocusEvent<HTMLInputElement>) =>
-    (e.currentTarget.style.borderColor = "rgba(255,255,255,.1)");
 
   return (
     <div className="auth-login-card" style={{
@@ -134,8 +130,6 @@ function LoginCard({ navigate }: { navigate: Nav["navigate"] }) {
           onChange={e => setEmail(e.target.value)}
           placeholder="your@email.com"
           style={inputStyle}
-          onFocus={inputFocus}
-          onBlur={inputBlur}
           onKeyDown={e => e.key === "Enter" && handleLogin()}
         />
       </div>
@@ -157,8 +151,6 @@ function LoginCard({ navigate }: { navigate: Nav["navigate"] }) {
             type={showPw ? "text" : "password"}
             placeholder="••••••••"
             style={{ ...inputStyle, paddingRight: 44 }}
-            onFocus={inputFocus}
-            onBlur={inputBlur}
             onKeyDown={e => e.key === "Enter" && handleLogin()}
           />
           <button

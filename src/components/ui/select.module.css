@@ -24,13 +24,9 @@
   border-color: rgba(255, 255, 255, 0.23);
   background-color: #1b1c26;
 }
-:global(#root) .trigger[data-ui-select][data-state='open'] {
+:global(#root) .trigger[data-ui-select][data-popup-open] {
   border-color: rgba(255, 172, 103, 0.6);
   box-shadow: 0 0 0 2px rgba(255, 172, 103, 0.1);
-}
-:global(html:not([data-ui-input='pointer'])) :global(#root) .trigger[data-ui-select]:focus-visible {
-  outline: 2px solid rgba(255, 172, 103, 0.75);
-  outline-offset: 2px;
 }
 :global(#root) .trigger[data-ui-select][data-disabled] {
   opacity: 0.45;
@@ -64,32 +60,44 @@
   color: rgba(255, 255, 255, 0.45);
   transition: transform 0.15s;
 }
-:global(#root) .trigger[data-state='open'] .chevron {
+:global(#root) .trigger[data-popup-open] .chevron {
   transform: rotate(180deg);
   color: #ffac67;
 }
+.positioner {
+  z-index: 1600;
+}
+
 :global(#root) .content[data-ui-popup] {
-  min-width: max(144px, var(--radix-select-trigger-width));
-  max-height: min(300px, var(--radix-select-content-available-height));
-  overflow: hidden;
+  box-sizing: border-box;
+  min-width: min(max(144px, var(--anchor-width)), var(--available-width));
+  max-width: min(calc(100vw - 16px), var(--available-width));
 }
-:global(#root) .viewport {
+
+:global(#root) .list {
+  box-sizing: border-box;
+  max-height: min(300px, calc(var(--available-height) - 2px));
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 5px;
+  border-radius: inherit;
 }
+
 :global(#root) .option {
   position: relative;
   display: flex;
   align-items: center;
-  min-height: 30px;
+  min-height: 34px;
   padding: 6px 30px 6px 10px;
   font-size: 12px;
   line-height: 1.5;
   user-select: none;
+  overflow-wrap: anywhere;
 }
 :global(#root) .option[data-highlighted] {
   color: #fff;
 }
-:global(#root) .option[data-state='checked'] {
+:global(#root) .option[data-selected] {
   color: #ffac63;
 }
 
@@ -100,15 +108,6 @@
   align-items: center;
   color: #ffac67;
 }
-:global(#root) .scroll {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 19px;
-  color: rgba(255, 255, 255, 0.45);
-  background: #181922;
-}
-
 :global(#root) .trigger[data-ui-select] {
   padding-inline-end: 28px !important;
 }

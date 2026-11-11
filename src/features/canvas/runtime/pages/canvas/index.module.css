@@ -1,0 +1,22 @@
+.content {
+  --library-inset: var(--canvas-library-gutter, 16px);
+  /* The scroll container's width excludes any scrollbar within the iframe. */
+  padding-inline: var(--library-inset)
+    max(0px, calc(var(--library-inset) + 100% - 100vw));
+}
+
+@media (min-width: 640px) {
+  .content {
+    --library-inset: var(--canvas-library-gutter, 32px);
+  }
+}
+
+.grid {
+  --card-gap: 1rem;
+  display: grid;
+  gap: var(--card-gap);
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(min(100%, max(250px, calc((100% - 3 * var(--card-gap)) / 4))), 1fr)
+  );
+}
